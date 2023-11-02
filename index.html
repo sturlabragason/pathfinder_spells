@@ -9,105 +9,62 @@
     <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link href="styles.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 p-6">
-    <!-- Checkbox for filtering spells on my list -->
-    <label>
-        <input type="checkbox" id="myListFilter"> Show only spells on my list
-    </label>
+<body class="p-6">
+
+    <!-- Filters Card -->
+    <div class="bg-brown p-4 shadow-md rounded-lg mb-6 text-parchment">
+        <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <!-- Checkbox for filtering spells on my list -->
+            <div class="flex items-center">
+                <input type="checkbox" id="myListFilter" class="mr-2">
+                <label for="myListFilter" class="cursor-pointer">Show only spells on my list</label>
+            </div>
+
+            <!-- Dropdown filter for spell levels -->
+            <div class="flex items-center">
+                <label for="spellLevelFilter" class="mr-2">Filter by Level:</label>
+                <select id="spellLevelFilter"
+                    class="border-gray-600 rounded-md shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-400 focus:ring-opacity-50"
+                    <option value="">All Levels</option>
+                    <option value="0">Level 0</option>
+                    <option value="1">Level 1</option>
+                    <option value="2">Level 2</option>
+                    <option value="3">Level 3</option>
+                    <option value="4">Level 4</option>
+                    <option value="5">Level 5</option>
+                    <option value="6">Level 6</option>
+                    <option value="7">Level 7</option>
+                    <option value="8">Level 8</option>
+                    <option value="9">Level 9</option>
+                </select>
+            </div>
+        </div>
+    </div>
 
     <!-- Spells Table -->
-    <table id="spellsTable" class="w-full">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>School</th>
-                <th>Level</th>
-                <th>Casting Time</th>
-                <th>Range</th>
-                <th>Link</th>
-                <!-- Invisible column for "On my list" -->
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data will be populated here by DataTables -->
-        </tbody>
-    </table>
+    <div class="overflow-x-auto">
+        <table id="spellsTable" class="w-full text-sm bg-parchment">
+            <thead class="text-lg uppercase bg-brown text-parchment">
+                <tr>
+                    <th class="py-3 px-6">Name</th>
+                    <th class="py-3 px-6">School</th>
+                    <th class="py-3 px-6">Level</th>
+                    <th class="py-3 px-6">Casting Time</th>
+                    <th class="py-3 px-6">Range</th>
+                    <th class="py-3 px-6">Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here by DataTables -->
+            </tbody>
+        </table>
+    </div>
 
-    <script>
-        $(document).ready(function () {
-            let dataTable = null;
-
-            // Load the TSV data using jQuery's AJAX
-            $.ajax({
-                url: 'spells.tsv', // Make sure the file name matches the uploaded TSV file
-                dataType: 'text',
-            }).done(successFunction);
-
-            function successFunction(data) {
-                // Split the data into rows
-                let allRows = data.split(/\r?\n|\r/);
-                let headers = allRows[0].split(/\t/); // Extract headers to find column indices
-                let tableData = [];
-
-                // Process each row
-                for (let singleRow = 1; singleRow < allRows.length; singleRow++) {
-                    let rowCells = allRows[singleRow].split(/\t/);
-
-                    // Extract data based on indices provided in the sample
-                    let name = rowCells[1];
-                    let school = rowCells[2];
-                    let level = rowCells[headers.indexOf('spell_level')];
-                    let castingTime = rowCells[headers.indexOf('casting_time')];
-                    let range = rowCells[headers.indexOf('range')];
-                    // Link logic
-                    let link = rowCells[headers.indexOf('link')];
-                    if (!link || link.trim().toLowerCase() === 'null' || link.trim() === name) {
-                        let spellNameFormatted = name.toLowerCase().replace(/\s+/g, '-').replace(/[’'"]/g, '');
-                        let firstLetter = spellNameFormatted.charAt(0);
-                        link = `https://www.d20pfsrd.com/magic/all-spells/${firstLetter}/${spellNameFormatted}`;
-                    }
-                    let onMyList = rowCells[headers.indexOf('On my list')];
-
-                    // Push the extracted data into the tableData array
-                    tableData.push({
-                        "name": name,
-                        "school": school,
-                        "level": level,
-                        "casting_time": castingTime,
-                        "range": range,
-                        "link": link, // Link is now added
-                        "on_my_list": onMyList
-                    });
-                }
-
-                // Initialize DataTable with the parsed data
-                dataTable = $('#spellsTable').DataTable({
-                    data: tableData,
-                    columns: [
-                        { title: 'Name', data: 'name' },
-                        { title: 'School', data: 'school' },
-                        { title: 'Level', data: 'level' },
-                        { title: 'Casting Time', data: 'casting_time' },
-                        { title: 'Range', data: 'range' },
-                        {
-                            title: 'Link', data: 'link', render: function (data, type, row) {
-                                return '<a href="' + data + '" target="_blank">' + row.name + '</a>';
-                            }
-                        },
-                        { title: 'On my list', data: 'on_my_list', visible: false } // Invisible column
-                    ]
-                });
-            }
-
-            // Event listener for the checkbox
-            $('#myListFilter').on('change', function () {
-                // Filter the dataTable based on the "On my list" column
-                dataTable.column(6).search(this.checked ? '1' : '', true, false).draw();
-            });
-        });
-    </script>
+    <!-- Include the external JS file -->
+    <script src="spells.js"></script>
 
 </body>
 

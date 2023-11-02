@@ -1,0 +1,41 @@
+/* styles.css */
+html body {
+    font-family: 'Times New Roman', serif;
+    background-color: #f0e4d7;
+    color: #3b2e1a;
+}
+
+html body .bg-brown {
+    background-color: #3b2e1a;
+}
+
+html body .text-parchment {
+    color: #f0e4d7;
+}
+
+html body .border-brown {
+    border-color: #3b2e1a;
+}
+
+html body table th,
+html body table td {
+    border: 1px solid #3b2e1a !important;
+}
+/* Custom styles for the spell level filter dropdown */
+#spellLevelFilter {
+    background-color: #ffffff !important; /* Change this to any color you want */
+    border: 2px solid #3b2e1a !important; /* Dark brown border */
+    border-radius: 0.5rem !important; /* Rounded borders */
+    padding: 0.5rem 1rem !important; /* Spacing inside the dropdown */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; /* Subtle shadow */
+    font-weight: bold !important; /* Make the font bold */
+    color: #3b2e1a !important; /* Text color */
+    cursor: pointer !important; /* Change cursor to pointer to indicate it's selectable */
+  }
+  
+  /* Styles for the dropdown when it's focused */
+  #spellLevelFilter:focus {
+    border-color: #6b8e23 !important; /* Olive green border for focused state */
+    ring: 4px #6b8e23 !important; /* Olive green ring for focused state */
+  }
+  
