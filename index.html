@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wizard Spells</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+    <!-- Checkbox for filtering spells on my list -->
+    <label>
+        <input type="checkbox" id="myListFilter"> Show only spells on my list
+    </label>
+
+    <!-- Spells Table -->
+    <table id="spellsTable" class="w-full">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>School</th>
+                <th>Level</th>
+                <th>Casting Time</th>
+                <th>Range</th>
+                <th>Link</th>
+                <!-- Invisible column for "On my list" -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be populated here by DataTables -->
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function () {
+            let dataTable = null;
+
+            // Load the TSV data using jQuery's AJAX
+            $.ajax({
+                url: 'spells.tsv', // Make sure the file name matches the uploaded TSV file
+                dataType: 'text',
+            }).done(successFunction);
+
+            function successFunction(data) {
+                // Split the data into rows
+                let allRows = data.split(/\r?\n|\r/);
+                let headers = allRows[0].split(/\t/); // Extract headers to find column indices
+                let tableData = [];
+
+                // Process each row
+                for (let singleRow = 1; singleRow < allRows.length; singleRow++) {
+                    let rowCells = allRows[singleRow].split(/\t/);
+
+                    // Extract data based on indices provided in the sample
+                    let name = rowCells[1];
+                    let school = rowCells[2];
+                    let level = rowCells[headers.indexOf('spell_level')];
+                    let castingTime = rowCells[headers.indexOf('casting_time')];
+                    let range = rowCells[headers.indexOf('range')];
+                    // Link logic
+                    let link = rowCells[headers.indexOf('link')];
+                    if (!link || link.trim().toLowerCase() === 'null' || link.trim() === name) {
+                        let spellNameFormatted = name.toLowerCase().replace(/\s+/g, '-').replace(/[’'"]/g, '');
+                        let firstLetter = spellNameFormatted.charAt(0);
+                        link = `https://www.d20pfsrd.com/magic/all-spells/${firstLetter}/${spellNameFormatted}`;
+                    }
+                    let onMyList = rowCells[headers.indexOf('On my list')];
+
+                    // Push the extracted data into the tableData array
+                    tableData.push({
+                        "name": name,
+                        "school": school,
+                        "level": level,
+                        "casting_time": castingTime,
+                        "range": range,
+                        "link": link, // Link is now added
+                        "on_my_list": onMyList
+                    });
+                }
+
+                // Initialize DataTable with the parsed data
+                dataTable = $('#spellsTable').DataTable({
+                    data: tableData,
+                    columns: [
+                        { title: 'Name', data: 'name' },
+                        { title: 'School', data: 'school' },
+                        { title: 'Level', data: 'level' },
+                        { title: 'Casting Time', data: 'casting_time' },
+                        { title: 'Range', data: 'range' },
+                        {
+                            title: 'Link', data: 'link', render: function (data, type, row) {
+                                return '<a href="' + data + '" target="_blank">' + row.name + '</a>';
+                            }
+                        },
+                        { title: 'On my list', data: 'on_my_list', visible: false } // Invisible column
+                    ]
+                });
+            }
+
+            // Event listener for the checkbox
+            $('#myListFilter').on('change', function () {
+                // Filter the dataTable based on the "On my list" column
+                dataTable.column(6).search(this.checked ? '1' : '', true, false).draw();
+            });
+        });
+    </script>
+
+</body>
+
+</html>
