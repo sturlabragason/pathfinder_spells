@@ -24,11 +24,17 @@ A web-based tool tailored for Pathfinder spellcasters, designed to manage and fi
 
 The JavaScript code includes a quick workaround for creating links to spell descriptions. This logic is not exhaustive and does not guarantee functional links for all spells but serves the current purpose for a large number of them. For a full implementation, additional logic or a complete dataset with valid URLs would be required.
 
-## Usage
+## Usage with Docker
+
+To set up and run the Pathfinder Spells application:
 
 1. Clone the repository or download the files to your local machine.
-2. Edit the `spells.tsv` to include your character's spells and desired metadata.
-3. Serve the website locally by running `python -m http.server 8008` from the project directory and visit `http://localhost:8008` in your browser.
+2. Optionally, edit the `spells.tsv` file to include your character's spells and desired metadata.
+3. In the directory with your project files, run the following command:
+```bash
+docker build -t pathfinder-spells . && docker run -d -p 80:80 pathfinder-spells
+```
+4. After running the command, browse to http://localhost in your web browser to access the application.
 
 ## Data Source
 
