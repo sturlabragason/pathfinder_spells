@@ -10,9 +10,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <link href="styles.css" rel="stylesheet">
+    <link rel="icon" href="data:,">
 </head>
 
-<body class="p-6">
+<body class="p-6" data-tsv="spells.tsv" data-spellbook="caladrel_ecthelion/spellbook.txt">
+
+    <header class="mb-6">
+        <h1 class="text-3xl font-bold">Pathfinder 1e Wizard Spells</h1>
+        <p>All sorcerer/wizard spells. Spellbook: <a class="underline" href="caladrel_ecthelion/">Caladrel Ecth&euml;lion</a>.
+            Spell names link to <a class="underline" href="https://aonprd.com/" target="_blank" rel="noopener">Archives of Nethys</a>.</p>
+    </header>
 
     <!-- Filters Card -->
     <div class="bg-brown p-4 shadow-md rounded-lg mb-6 text-parchment">
@@ -20,14 +27,14 @@
             <!-- Checkbox for filtering spells on my list -->
             <div class="flex items-center">
                 <input type="checkbox" id="myListFilter" class="mr-2">
-                <label for="myListFilter" class="cursor-pointer">Show only spells on my list</label>
+                <label for="myListFilter" class="cursor-pointer">Show only spells in Caladrel&#39;s spellbook</label>
             </div>
 
             <!-- Dropdown filter for spell levels -->
             <div class="flex items-center">
                 <label for="spellLevelFilter" class="mr-2">Filter by Level:</label>
                 <select id="spellLevelFilter"
-                    class="border-gray-600 rounded-md shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-400 focus:ring-opacity-50"
+                    class="border-gray-600 rounded-md shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-400 focus:ring-opacity-50">
                     <option value="All">All Levels</option>
                     <option value="0">Level 0</option>
                     <option value="1">Level 1</option>
@@ -44,6 +51,8 @@
         </div>
     </div>
 
+    <p id="loadError" class="hidden mb-6 font-bold"></p>
+
     <!-- Spells Table -->
     <div class="overflow-x-auto">
         <table id="spellsTable" class="w-full text-sm bg-parchment">
@@ -54,7 +63,6 @@
                     <th class="py-3 px-6">Level</th>
                     <th class="py-3 px-6">Casting Time</th>
                     <th class="py-3 px-6">Range</th>
-                    <th class="py-3 px-6">Link</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,7 +71,6 @@
         </table>
     </div>
 
-    <!-- Include the external JS file -->
     <script src="spells.js"></script>
 
 </body>

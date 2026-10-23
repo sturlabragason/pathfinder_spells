@@ -13,6 +13,7 @@ COPY index.html ./
 COPY spells.js ./
 COPY styles.css ./
 COPY spells.tsv ./
+COPY caladrel_ecthelion/ ./caladrel_ecthelion/
 
 # Expose port 80
 EXPOSE 80

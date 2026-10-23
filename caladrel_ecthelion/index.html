@@ -1,238 +1,90 @@
-Character Information:
-Name: Caladrel Écthelion
-Alignment: Lawful Good
-Player: Sturla
-Class: Wizard (Conjurer / Handvanduldr) Level 5
-Homeland: Elf Town
-Race: Elf
-Size: Medium
-Gender: M
-Age: 85
-Height: 6 ft 10
-Weight: Dark-Silver
-Hair: Dark-Blue
-Eyes: -
+<!DOCTYPE html>
+<html lang="en">
 
-Ability Scores:
-STR: 8 (Modifier: -2)
-DEX: 17 (Modifier: +3)
-CON: 12 (Modifier: +1)
-INT: 22 (Modifier: +6)
-WIS: 7 (Modifier: -2)
-CHA: 13 (Modifier: +1)
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caladrel Ecth&euml;lion - Spellbook</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link href="../styles.css" rel="stylesheet">
+    <link rel="icon" href="data:,">
+</head>
 
-Hit Points:
-Current: 18
-Max: 32
+<body class="p-6" data-tsv="../spells.tsv" data-spellbook="spellbook.txt" data-opposed="enchantment,divination">
 
-Armor Class (AC): 15
-Touch AC: 15
-Flat-Footed AC: 10
+    <!-- Character card -->
+    <div class="bg-brown p-4 shadow-md rounded-lg mb-6 text-parchment flex flex-col md:flex-row md:items-start md:space-x-6">
+        <img src="https://raw.githubusercontent.com/sturlabragason/pathfinder/main/caladrel.jpg"
+            alt="Portrait of Caladrel Ecth&euml;lion" class="portrait w-40 rounded-lg mb-4 md:mb-0">
+        <div class="flex-1">
+            <h1 class="text-3xl font-bold">Caladrel Ecth&euml;lion</h1>
+            <p class="mb-2">Elf Wizard 7 &middot; Conjurer (Teleportation subschool) &middot; INT 22 (+6)</p>
+            <p class="mb-2">Opposed schools: <strong>Enchantment</strong>, <strong>Divination</strong>
+                (marked <span class="opposed-badge">opposed</span> below; preparing one uses two slots).</p>
+            <p class="mb-4">
+                Full character sheet:
+                <a class="underline" href="https://github.com/sturlabragason/pathfinder/blob/main/caladrel-ecthelion.md" target="_blank" rel="noopener">caladrel-ecthelion.md</a>
+                &middot; <a class="underline" href="https://github.com/sturlabragason/pathfinder/blob/main/caladrel-ecthelion.homebrewery.md" target="_blank" rel="noopener">Homebrewery version</a>
+                &middot; <a class="underline" href="https://raw.githubusercontent.com/sturlabragason/pathfinder/main/caladrel.jpg" target="_blank" rel="noopener">portrait</a>
+                &middot; <a class="underline" href="../">all wizard spells</a>
+            </p>
 
-Saves:
-Fortitude: 4
-Reflex: 8
-Will: 6
+            <table class="slots text-center">
+                <thead>
+                    <tr><th>Spell level</th><th>0</th><th>1st</th><th>2nd</th><th>3rd</th><th>4th</th></tr>
+                </thead>
+                <tbody>
+                    <tr><th>Spells per day</th><td>4</td><td>7</td><td>6</td><td>4</td><td>2</td></tr>
+                    <tr><th>Save DC</th><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td></tr>
+                    <tr><th>In spellbook</th><td data-known-level="0"></td><td data-known-level="1"></td><td data-known-level="2"></td><td data-known-level="3"></td><td data-known-level="4"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-Base Attack Bonus: 2
-Combat Maneuver Bonus (CMB): 0
-Combat Maneuver Defense (CMD): 15
-Spell Resistance: 0
+    <!-- Filters Card -->
+    <div class="bg-brown p-4 shadow-md rounded-lg mb-6 text-parchment">
+        <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div class="flex items-center">
+                <input type="checkbox" id="myListFilter" class="mr-2" checked>
+                <label for="myListFilter" class="cursor-pointer">Show only spells in his spellbook</label>
+            </div>
+            <div class="flex items-center">
+                <label for="spellLevelFilter" class="mr-2">Filter by Level:</label>
+                <select id="spellLevelFilter">
+                    <option value="All">All Levels</option>
+                    <option value="0">Level 0</option>
+                    <option value="1">Level 1</option>
+                    <option value="2">Level 2</option>
+                    <option value="3">Level 3</option>
+                    <option value="4">Level 4</option>
+                </select>
+            </div>
+        </div>
+    </div>
 
-Weapons/Attacks:
-Dagger: Attack +1, Damage 1d4-2
-Crossbow, Light: Attack +7, Damage 1d8+0, Ammo 20
+    <p id="loadError" class="hidden mb-6 font-bold"></p>
 
-Speed:
-Land: 60
-Temp: 30
-Run: 20
-Climb: 15
-Swim: 15
-Fly: 0
-Other: 0
+    <div class="overflow-x-auto">
+        <table id="spellsTable" class="w-full text-sm bg-parchment">
+            <thead class="text-lg uppercase bg-brown text-parchment">
+                <tr>
+                    <th class="py-3 px-6">Name</th>
+                    <th class="py-3 px-6">School</th>
+                    <th class="py-3 px-6">Level</th>
+                    <th class="py-3 px-6">Casting Time</th>
+                    <th class="py-3 px-6">Range</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
-Senses: Low-Light Vision
+    <script src="../spells.js"></script>
 
-Languages: Common, Elven, Draconic, Celestial, Orc, Sylvan, Infernal.
+</body>
 
-Skills: 
-Appraise: 10
-Bluff: -2
-Climb: -2
-Craft (Alchemy): 10
-Craft (Calligraphy): 10
-Craft (Cartography): 10
-Diplomacy: 2
-Disable Device: 4
-Disguise: -2
-Escape Artist: -2
-Fly: 6
-Handle Animal: 0
-Heal: -2
-Intimidate: 0
-Knowledge (Arcana): 14
-Knowledge (Dungeoneering): 10
-Knowledge (Engineering): 10
-Knowledge (Geography): 10
-Knowledge (History): 10
-Knowledge (Local): 10
-Knowledge (Nature): 10
-Knowledge (Nobility): 10
-Knowledge (Planes): 14
-Knowledge (Religion): 10
-Linguistics: 10
-Perception: 5
-Perform: -2
-Profession: 0
-Ride: 4
-Sense Motive: 0
-Sleight of Hand: 5
-Spellcraft: 14
-Stealth: 4
-Survival: 0
-Swim: -2
-Use Magic Device: -2
-
-
-## GEAR:
-- Headband of Vast Intelligence: QTY 1, WEIGHT 1
-- Lesser extend metamagic rod: QTY 1, WEIGHT 0
-- Dagger: QTY 1, WEIGHT 1
-- Spellbook, Wizard's: QTY 1, WEIGHT 3
-- Spell Component Pouch: QTY 1, WEIGHT 2
-- Ecthelion Signet Ring: QTY 1, WEIGHT 0
-- Scholar's Outfit: QTY 1, WEIGHT 6
-- Pouch, belt: QTY 1, WEIGHT 0.5
-- Case, Scroll: QTY 3, WEIGHT 0.5 (Total WEIGHT 1.5)
-- Bandolier: QTY 1, WEIGHT 0
-- Ring of Pengolodh (Bonded Object): QTY 1, WEIGHT 0
-- Blank Scrolls: QTY 8, WEIGHT 0
-- Library Card: QTY 1, WEIGHT 0
-- Crossbow, Light: QTY 1, WEIGHT 4
-- Scroll of Swift Girding: QTY 2, WEIGHT 0
-- Scroll of Knock: QTY 1, WEIGHT 0
-- Maps: QTY 1, WEIGHT 0
-- Scroll of Air Bubble: QTY 1, WEIGHT 0
-- Scroll of Obscuring Mist: QTY 1, WEIGHT 0
-- Scroll of Feather Fall: QTY 1, WEIGHT 0
-- Scroll of Illusion of Calm: QTY 1, WEIGHT 0
-- Scroll of Protection from Evil: QTY 1, WEIGHT 0
-- Scroll of Mudball: QTY 1, WEIGHT 0
-- Wand of Detect Magic: QTY 1, CHARGES 19
-- Bolts: QTY 20, WEIGHT 0.1 (Total WEIGHT 2)
-- Cloak of resistance +1: QTY 1, WEIGHT 1
-- Scroll of false life: QTY 1, WEIGHT 0
-- Scroll of mount: QTY 1, WEIGHT 0
-
-## FEATS:
-- Spell Focus (Conjuration) (Misc)
-- Greater Spell Focus (Conjuration) (General)
-- Improved Initiative (Combat)
-- Scribe Scroll (Item creation)
-- Combat Casting (General)
-- Eschew Materials (General)
-
-## FEATURES / TRAITS:
-- Moonkissed (Racial)
-- Overwhelming Magic (Racial)
-- Low-Light Vision (Racial)
-- Warrior of Old (Combat): You gain a +2 trait bonus on initiative checks.
-- Arcane Bond - Ring of Pengolodh (Sp) (Spell-Like Ability): 1 / 1 per day
-- Arcane School (Conjuration - Teleportation) (Class)
-- Shift (10 ft.) (Supernatural Ability): 9 / 9 per day
-- Cantrips (Class)
-- Summoner's Charm (Supernatural Ability)
-- Master of Pentacles (Magic): 0 / 1 per day
-- Lesser extend metamagic rod: 3 / 3 per day
-
-## SPELLS
-
-LEVEL 0:
-- Acid Splash
-- Dancing Lights
-- Detect Magic
-- Ghost Sound
-- Prestidigitation
-- Message
-- Mage Hand
-- Open Close
-- Read Magic
-- Scrivener's Chant
-
-LEVEL 1:
-- Air Bubble
-- Blend
-- Charm Person
-- Disguise Self
-- Expeditious Retreat
-- Ear-piercing Scream
-- Endure Elements
-- Feather Fall
-- Grease
-- Identify
-- Illusion Of Calm
-- Mage Armor
-- Magic Missile
-- Mount
-- Mudball
-- Obscuring Mist
-- Protection From Evil
-- Ray Of Enfeeblement
-- Shadow Trap
-- Shield
-- Silent Image
-- Snowball
-- Stone Shield
-- Stunning Barrier
-- Summon Monster I
-- Swift Girding
-- Thunderstomp
-
-LEVEL 2:
-- Bull's Strength
-- Burning Arc
-- Communal Mount
-- Create Pit
-- False Life
-- Fog Cloud
-- Glitterdust
-- Hideous Laughter
-- Invisibility
-- Knock
-- Make Whole
-- Mirror Image
-- Protection From Arrows
-- Resist Energy
-- Rope Trick
-- See Invisibility
-- Spider Climb
-- Stone Call
-- Summon Monster II
-- Summon Swarm
-- Web
-- Scorching Ray
-
-LEVEL 3:
-- Aqueous Orb
-- Chain Of Perdition
-- Dispel Magic
-- Displacement
-- Fireball
-- Greater Thunderstomp
-- Greater Stunning Barrier
-- Halt Undead
-- Haste
-- Lightning Bolt
-- Mad Monkeys
-- Major Image
-- Rain Of Frogs
-- Ray Of Exhaustion
-- Summon Monster III
-- Spiked Pit
-- Stinking Cloud
-- Suggestion
-- Slow
-- Shifting Sands
-- Gaseuous form
-
+</html>

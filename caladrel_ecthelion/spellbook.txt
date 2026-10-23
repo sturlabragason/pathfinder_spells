@@ -1,0 +1,114 @@
+# Caladrel Ecthelion's spellbook: one spell name per line, as spelled in spells.tsv (case-insensitive).
+# Lines starting with # are comments. Add a line when he learns a spell.
+
+# Cantrips (level 0)
+Acid Splash
+Arcane Mark
+Bleed
+Breeze
+Chameleon Scales
+Dancing Lights
+Detect Magic
+Disrupt Undead
+Drench
+Flare
+Ghost Sound
+Haunted Fey Aspect
+Jolt
+Light
+Mage Hand
+Mending
+Message
+Oath Of Anonymity
+Open/Close
+Penumbra
+Prestidigitation
+Ray of Frost
+Read Magic (Not in Spellbook)
+Resistance
+Root
+Scoop
+Sotto Voce
+Spark
+Touch of Fatigue
+Vacuous Vessel
+
+# Level 1
+Air Bubble
+Blend
+Charm Person
+Disguise Self
+Ear-Piercing Scream
+Endure Elements
+Expeditious Retreat
+Feather Fall
+Grease
+Identify
+Illusion of Calm
+Mage Armor
+Magic Missile
+Mount
+Mudball
+Obscuring Mist
+Protection From Evil
+Ray Of Enfeeblement
+Serren's Swift Girding
+Shadow Trap
+Shield
+Silent Image
+Snowball
+Stone Shield
+Stunning Barrier
+Summon Monster I
+Thunderstomp
+
+# Level 2
+Blur
+Bull's Strength
+Burning Arc
+Create Pit
+False Life
+Fire Breath
+Fog Cloud
+Glitterdust
+Hideous Laughter
+Invisibility
+Knock
+Make Whole
+Mirror Image
+Mount, Communal
+Protection From Arrows
+Resist Energy
+Scorching Ray
+See Invisibility
+Spider Climb
+Stone Call
+Summon Monster II
+Summon Swarm
+Web
+
+# Level 3
+Aqueous Orb
+Chain of Perdition
+Dispel Magic
+Displacement
+Fireball
+Fly
+Gaseous Form
+Halt Undead
+Haste
+Heroism
+Lightning Bolt
+Mad Monkeys
+Rain of Frogs
+Ray of Exhaustion
+Shifting Sand
+Slow
+Spiked Pit
+Stinking Cloud
+Stunning Barrier, Greater
+Suggestion
+Summon Monster III
+Thunderstomp, Greater
+
+# Level 4

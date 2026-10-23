@@ -1,133 +1,117 @@
-$.fn.dataTable.ext.search.push(
-    function (settings, data, dataIndex) {
-        var filterValue = $('#spellLevelFilter').val(); // Get the value of the dropdown
-        var spellLevelColumn = data[2]; // Assuming level data is in the third column
+// Spell table for index.html and caladrel_ecthelion/index.html.
+// Page settings come from data-* attributes on <body>:
+//   data-tsv        path to spells.tsv                 (default "spells.tsv")
+//   data-spellbook  path to the spellbook name list    (default "caladrel_ecthelion/spellbook.txt")
+//   data-opposed    comma-separated opposed schools    (default "enchantment,divination")
+$(function () {
+    const body = document.body.dataset;
+    const tsvUrl = body.tsv || 'spells.tsv';
+    const spellbookUrl = body.spellbook || 'caladrel_ecthelion/spellbook.txt';
+    const opposed = (body.opposed || 'enchantment,divination').toLowerCase().split(',').map(s => s.trim());
+    const AON_SEARCH = 'https://aonprd.com/Search.aspx?Query=';
 
-        // If no filter is selected, do not filter the rows
-        if (!filterValue) {
-            return true;
-        }
+    const $level = $('#spellLevelFilter');
+    const $mine = $('#myListFilter');
+    let table = null;
 
-        // Parse the spell level column for 'sorcerer/wizard X' where X is the level
-        var levelMatch = spellLevelColumn.match(/sorcerer\/wizard (\d+)/);
+    const normalise = name => name.replace(/\u2019/g, "'").trim().toLowerCase();
+    const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-        // If there's a match and it equals the filter value, return true; otherwise, false
-        if (levelMatch && levelMatch[1] === filterValue) {
-            return true;
-        }
-        return false;
-    }
-);
-
-$(document).ready(function () {
-    let dataTable = null;
-
-    // Load the TSV data using jQuery's AJAX
-    $.ajax({
-        url: 'spells.tsv', // Make sure the file name matches the uploaded TSV file
-        dataType: 'text',
-    }).done(successFunction);
-
-    function successFunction(data) {
-        // Split the data into rows
-        let allRows = data.split(/\r?\n|\r/);
-        let headers = allRows[0].split(/\t/); // Extract headers to find column indices
-        let tableData = [];
-
-        // Process each row
-        for (let singleRow = 1; singleRow < allRows.length; singleRow++) {
-            let rowCells = allRows[singleRow].split(/\t/);
-
-            // Extract data based on indices provided in the sample
-            let name = rowCells[1];
-            let school = rowCells[2];
-            let level = rowCells[headers.indexOf('spell_level')];
-            let castingTime = rowCells[headers.indexOf('casting_time')];
-            let range = rowCells[headers.indexOf('range')];
-            // Link logic
-            let link = rowCells[headers.indexOf('link')];
-            if (!link || link.trim().toLowerCase() === 'null' || link.trim() === name) {
-                let spellNameFormatted = name.toLowerCase().replace(/\s+/g, '-').replace(/[’'"]/g, '');
-                let firstLetter = spellNameFormatted.charAt(0);
-                link = `https://www.d20pfsrd.com/magic/all-spells/${firstLetter}/${spellNameFormatted}`;
-            }
-            let onMyList = rowCells[headers.indexOf('On my list')];
-            // Extract and refactor level data
-            let levelCell = rowCells[headers.indexOf('spell_level')];
-            let levelMatches = levelCell.match(/sorcerer\/wizard (\d+)/);
-            let wizardLevel = levelMatches ? levelMatches[0] : ''; // Extract "sorcerer/wizard X" where X is the level
-
-            // Push the extracted data into the tableData array
-            tableData.push({
-                "name": name,
-                "school": school,
-                "level": level,
-                "casting_time": castingTime,
-                "range": range,
-                "hyperlink": link, // Link is now added
-                "on_my_list": onMyList
-            });
-        }
-
-        // Initialize DataTable with the parsed data
-        // Initialize DataTable with the parsed data
-        dataTable = $('#spellsTable').DataTable({
-            data: tableData,
-            pageLength: 100,
-            columns: [
-                {
-                    title: 'Name',
-                    data: 'name',
-                    render: function (data, type, row) {
-                        return '<a href="' + row.hyperlink + '" target="_blank">' + data + '</a>';
-                    }
-                },
-                { title: 'School', data: 'school' },
-                {
-                    title: 'Level',
-                    data: 'level',
-                    render: function (data, type, row) {
-                        // Check the type of action DataTables is currently performing
-                        if (type === 'display') {
-                            // If it's for display, show only the level number for sorcerer/wizard
-                            var levelMatch = data.match(/sorcerer\/wizard (\d+)/);
-                            return levelMatch ? levelMatch[1] : ''; // Return just the level number
-                        } else {
-                            // For other types (like sorting or filtering), return the full data
-                            return data;
-                        }
-                    }
-                },
-                { title: 'Casting Time', data: 'casting_time' },
-                { title: 'Range', data: 'range' },
-                { title: 'On my list', data: 'on_my_list', visible: false }
-            ]
-        });
-        // Event listener for the dropdown
-        $('#spellLevelFilter').on('change', function () {
-            dataTable.draw(); // Redraw the table with the new filter applied
-        });
-
+    function parseSpellbook(text) {
+        return new Set(text.split(/\r?\n/)
+            .map(line => line.replace(/#.*/, ''))
+            .filter(line => line.trim())
+            .map(normalise));
     }
 
+    function parseTsv(text, spellbook) {
+        const lines = text.split(/\r?\n/).filter(line => line.trim());
+        const headers = lines[0].split('\t');
+        const col = name => headers.indexOf(name);
+        const c = {
+            mine: col('On my list'), name: col('name'), school: col('school'), wiz: col('wiz'),
+            casting: col('casting_time'), range: col('range'), url: col('url')
+        };
+        return lines.slice(1).map(line => {
+            const cells = line.split('\t');
+            const name = cells[c.name];
+            const school = (cells[c.school] || '').toLowerCase();
+            const url = c.url >= 0 && cells[c.url] ? cells[c.url] : AON_SEARCH + encodeURIComponent(name);
+            return {
+                name: name,
+                school: school,
+                level: parseInt(cells[c.wiz], 10),
+                casting_time: cells[c.casting] || '',
+                range: cells[c.range] || '',
+                url: url,
+                mine: spellbook ? spellbook.has(normalise(name)) : cells[c.mine] === '1',
+                opposed: opposed.includes(school)
+            };
+        });
+    }
 
-
-
-    // Event listener for the checkbox
-    $('#myListFilter').on('change', function () {
-        // Filter the dataTable based on the "On my list" column
-        dataTable.column(5).search(this.checked ? '1' : '', true, false).draw();
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex, row) {
+        if (settings.nTable.id !== 'spellsTable') {
+            return true;
+        }
+        const level = $level.val();
+        if (level && level !== 'All' && row.level !== parseInt(level, 10)) {
+            return false;
+        }
+        return !$mine.prop('checked') || row.mine;
     });
 
-    // $('#spellLevelFilter').on('change', function () {
-    //     if (dataTable) {
-    //         // Assume the 'Level' column is the third one (index 2, since indexing starts at 0)
-    //         let levelIndex = 2; // This should match the actual index of the 'Level' column in your DataTable
-    //         let searchTerm = this.value ? this.value : '';
-    //         dataTable.column(levelIndex).search(searchTerm).draw();
-    //     }
-    // });
+    function showKnownCounts(rows) {
+        $('[data-known-level]').each(function () {
+            const level = parseInt(this.dataset.knownLevel, 10);
+            this.textContent = rows.filter(r => r.mine && r.level === level).length;
+        });
+    }
 
+    function build(rows) {
+        showKnownCounts(rows);
+        table = $('#spellsTable').DataTable({
+            data: rows,
+            pageLength: 100,
+            order: [[2, 'asc'], [0, 'asc']],
+            createdRow: function (tr, row) {
+                if (row.opposed) {
+                    tr.classList.add('opposed');
+                }
+                if (row.mine) {
+                    tr.classList.add('mine');
+                }
+            },
+            columns: [
+                {
+                    title: 'Name', data: 'name',
+                    render: (name, type, row) => type === 'display'
+                        ? '<a href="' + escapeHtml(row.url) + '" target="_blank" rel="noopener">' + escapeHtml(name) + '</a>'
+                        : name
+                },
+                {
+                    title: 'School', data: 'school',
+                    render: (school, type, row) => type === 'display' && row.opposed
+                        ? escapeHtml(school) + ' <span class="opposed-badge" title="Opposed school: costs two slots to prepare">opposed</span>'
+                        : (type === 'display' ? escapeHtml(school) : school)
+                },
+                { title: 'Level', data: 'level', render: (level, type) => (isNaN(level) ? '' : level) },
+                { title: 'Casting Time', data: 'casting_time', render: $.fn.dataTable.render.text() },
+                { title: 'Range', data: 'range', render: $.fn.dataTable.render.text() }
+            ]
+        });
+        $level.add($mine).on('change', () => table.draw());
+    }
 
-
+    $.when(
+        $.ajax({ url: tsvUrl, dataType: 'text' }),
+        $.ajax({ url: spellbookUrl, dataType: 'text' }).then(text => parseSpellbook(text), () => $.Deferred().resolve(null))
+    ).done(function (tsv, spellbook) {
+        if (!spellbook) {
+            console.warn('Spellbook list not found at ' + spellbookUrl + '; using the "On my list" column of spells.tsv.');
+        }
+        build(parseTsv(tsv[0], spellbook));
+    }).fail(function () {
+        $('#loadError').removeClass('hidden').text('Could not load ' + tsvUrl + '. Serve this folder over HTTP (see README).');
+    });
 });
