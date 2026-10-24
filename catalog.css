@@ -1,0 +1,213 @@
+/* Card catalogue design system: shared by the character sheet and the spells pages. */
+@font-face { font-family: "Courier Prime"; src: url("fonts/CourierPrime-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Courier Prime"; src: url("fonts/CourierPrime-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Courier Prime"; src: url("fonts/CourierPrime-Italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Courier Prime"; src: url("fonts/CourierPrime-BoldItalic.woff2") format("woff2"); font-weight: 700; font-style: italic; font-display: swap; }
+
+:root {
+  /* drawer */
+  --oak-900: #17110c;
+  --oak-800: #21180f;
+  --oak-700: #2e2216;
+  --oak-500: #5a4430;
+  --brass: #b8925a;
+  --brass-hi: #e3c58c;
+  --brass-lo: #6e5330;
+  /* card stock */
+  --stock: #f5f4ee;
+  --stock-shade: #e9e7dd;
+  --feint: rgba(86, 140, 186, 0.28);
+  --head-rule: #c23b2e;
+  /* ribbon inks */
+  --ink: #1e1d22;
+  --ink-soft: #4a4740;
+  --ink-red: #a3261c;
+  --stamp: #5b2b7e;
+  /* guide-card pressboard */
+  --guide-buff: #e4cf9b;
+  --guide-salmon: #e9a78e;
+  --guide-sage: #abc19b;
+  --guide-cadet: #97afc6;
+  --guide-lilac: #c3b0d4;
+  --guide-ochre: #d9b25f;
+  /* one ink per school, used everywhere a school appears */
+  --sch-abjuration: #24598a;
+  --sch-conjuration: #0d6b5c;
+  --sch-divination: #7a5c08;
+  --sch-enchantment: #9c2c68;
+  --sch-evocation: #b0301f;
+  --sch-illusion: #4a3f9c;
+  --sch-necromancy: #34343a;
+  --sch-transmutation: #95501a;
+  --sch-universal: #56636b;
+
+  --font: "Courier Prime", "Courier New", monospace;
+  --line: 1.5rem;            /* one typed line; feint rules follow it */
+  --t-small: 0.8125rem;
+  --t-body: 1rem;
+  --t-label: 1.125rem;
+  --t-value: 1.75rem;
+  --t-plate: 1.375rem;
+  --radius-card: 3px;
+  --shadow-card: 0 1px 1px rgba(0,0,0,.35), 0 6px 14px -4px rgba(0,0,0,.55);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scrollbar-color: var(--brass-lo) var(--oak-900); }
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--t-body);
+  line-height: var(--line);
+  color: var(--ink);
+  background-color: var(--oak-800);
+  background-image:
+    repeating-linear-gradient(92deg, rgba(255,255,255,.012) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(88deg, rgba(0,0,0,.18) 0 1px, transparent 1px 23px),
+    linear-gradient(180deg, var(--oak-700), var(--oak-900) 70%);
+  background-attachment: fixed;
+  font-variant-numeric: tabular-nums lining-nums;
+  min-height: 100vh;
+}
+::selection { background: var(--guide-ochre); color: var(--ink); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--oak-900); }
+::-webkit-scrollbar-thumb { background: var(--brass-lo); border-radius: 5px; border: 2px solid var(--oak-900); }
+input, textarea, select { caret-color: var(--ink-red); }
+a { color: var(--sch-abjuration); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { color: var(--ink-red); }
+:focus-visible { outline: 2px solid var(--brass-hi); outline-offset: 2px; border-radius: 2px; }
+.card :focus-visible { outline-color: var(--ink-red); }
+[hidden] { display: none !important; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---- drawer front: brass label holder ---- */
+.plate {
+  display: grid; justify-items: center; gap: 2px;
+  margin: 14px auto 0; padding: 10px 18px 9px; width: min(100% - 28px, 34rem);
+  background: linear-gradient(180deg, var(--brass-hi), var(--brass) 45%, var(--brass-lo));
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 3px rgba(0,0,0,.35), 0 3px 8px rgba(0,0,0,.6);
+  position: relative;
+}
+.plate::before, .plate::after { /* rivets */
+  content: ""; position: absolute; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--brass-hi), var(--brass-lo));
+  box-shadow: 0 1px 1px rgba(0,0,0,.5);
+}
+.plate::before { left: 8px; } .plate::after { right: 8px; }
+.plate-label {
+  width: 100%; text-align: center; background: var(--stock); padding: 4px 10px 3px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.35);
+}
+.plate h1 { margin: 0; font-size: var(--t-plate); line-height: 1.2; letter-spacing: .04em; font-weight: 700; text-wrap: balance; }
+.plate p { margin: 0; font-size: var(--t-small); line-height: 1.3; color: var(--ink-soft); }
+
+/* ---- guide cards: the tab rail ---- */
+.guides {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; gap: 4px; align-items: flex-end; overflow-x: auto; scrollbar-width: none;
+  padding: 10px 12px 0; margin-top: 10px;
+  background: linear-gradient(180deg, var(--oak-900) 70%, rgba(23,17,12,0));
+}
+.guides::-webkit-scrollbar { display: none; }
+.guide {
+  flex: 0 0 auto; display: block; padding: 7px 14px 6px; min-height: 40px;
+  font: 700 var(--t-small)/1.5 var(--font); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink); text-decoration: none; border: 0; cursor: pointer;
+  background: var(--tab, var(--guide-buff));
+  border-radius: 7px 7px 0 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 -1px 2px rgba(0,0,0,.4);
+  transform: translateY(6px); transition: transform .25s var(--ease-out), filter .25s var(--ease-out);
+  filter: saturate(.75) brightness(.86);
+}
+.guide:nth-child(2n) { margin-top: 3px; }
+.guide:hover { transform: translateY(3px); filter: none; color: var(--ink); }
+.guide[aria-current="page"], .guide[aria-selected="true"] { transform: translateY(0); filter: none; }
+.guide-rule { height: 6px; background: var(--tab-active, var(--guide-buff)); box-shadow: 0 2px 4px rgba(0,0,0,.45); }
+
+/* ---- index card ---- */
+.card {
+  position: relative;
+  background-color: var(--stock);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 0 16px 18px;
+  color: var(--ink);
+}
+.card-head {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 4px 10px;
+  min-height: 3.25rem; padding: 10px 0 6px;
+  border-bottom: 2px solid var(--head-rule);
+}
+.call { font-size: var(--t-small); color: var(--ink-red); letter-spacing: .02em; white-space: nowrap; }
+.card-head h2, .card-head h3 {
+  margin: 0; font-size: var(--t-label); line-height: 1.25; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; text-wrap: balance;
+}
+.card-head .aside { font-size: var(--t-small); color: var(--ink-soft); text-align: right; }
+.card-body { padding-top: 0; }
+.card p { margin: 0 0 var(--line); max-width: 70ch; }
+.card p:last-child { margin-bottom: 0; }
+/* feint rules follow each typed line, so they always sit under the text */
+.card > p:not(.note), .card .ruled p, .card p.ruled {
+  background-image: repeating-linear-gradient(180deg, transparent 0 calc(var(--line) - 1px), var(--feint) calc(var(--line) - 1px) var(--line));
+}
+.typed li { box-shadow: inset 0 -1px 0 var(--feint); }
+
+/* typed key/value with dot leaders */
+.typed { list-style: none; margin: 0; padding: 0; }
+.typed li { display: flex; align-items: baseline; gap: 6px; min-height: var(--line); }
+.typed li > :first-child { flex: 0 1 auto; }
+.typed li::after { content: none; }
+.typed .lead { flex: 1 1 1rem; border-bottom: 2px dotted rgba(30,29,34,.45); transform: translateY(-5px); min-width: 1rem; }
+.typed b, .typed .v { flex: 0 1 auto; min-width: 0; font-weight: 700; text-align: right; }
+
+/* school ink */
+.sch { color: var(--sch); }
+[data-school="abjuration"] { --sch: var(--sch-abjuration); }
+[data-school="conjuration"] { --sch: var(--sch-conjuration); }
+[data-school="divination"] { --sch: var(--sch-divination); }
+[data-school="enchantment"] { --sch: var(--sch-enchantment); }
+[data-school="evocation"] { --sch: var(--sch-evocation); }
+[data-school="illusion"] { --sch: var(--sch-illusion); }
+[data-school="necromancy"] { --sch: var(--sch-necromancy); }
+[data-school="transmutation"] { --sch: var(--sch-transmutation); }
+[data-school="universal"] { --sch: var(--sch-universal); }
+.school-mark {
+  display: inline-block; font-size: var(--t-small); line-height: 1.2; padding: 1px 5px 0;
+  color: var(--sch); border: 1px solid currentColor; border-radius: 2px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+}
+
+/* rubber stamp */
+.stamp {
+  display: inline-block; font: 700 var(--t-small)/1.1 var(--font); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--stamp); border: 2px solid currentColor; border-radius: 3px; padding: 3px 6px 2px;
+  transform: rotate(-6deg); opacity: .88; mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(circle at 30% 40%, #000 60%, rgba(0,0,0,.75) 61%, #000 75%);
+          mask-image: radial-gradient(circle at 30% 40%, #000 60%, rgba(0,0,0,.75) 61%, #000 75%);
+}
+.stamp.red { color: var(--ink-red); }
+
+/* controls typed on the card */
+.key {
+  font: 700 var(--t-body)/1 var(--font); color: var(--ink); background: var(--stock-shade);
+  border: 1px solid rgba(30,29,34,.35); border-radius: 3px; min-width: 44px; min-height: 44px; padding: 0 10px; cursor: pointer;
+  box-shadow: 0 1px 0 rgba(30,29,34,.25);
+  transition: background-color .15s var(--ease-out), transform .1s var(--ease-out);
+}
+.key:hover { background: #fff; }
+.key:active { transform: translateY(1px); box-shadow: none; }
+.key:disabled { opacity: .45; cursor: not-allowed; }
+.field {
+  font: 400 var(--t-body)/1.4 var(--font); color: var(--ink); background: #fff;
+  border: 1px solid rgba(30,29,34,.4); border-radius: 2px; padding: 8px 10px; min-height: 44px; width: 100%;
+}
+.field::placeholder { color: #6b675d; }
+
+.drawer { width: min(100% - 20px, 64rem); margin: 0 auto; padding: 14px 0 64px; display: grid; gap: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}

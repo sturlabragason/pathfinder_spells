@@ -1,90 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caladrel Ecth&euml;lion - Spellbook</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <link href="../styles.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#17110c">
+    <title>Caladrel's spell drawer · Ecthëlion, Wizard 7</title>
+    <meta name="description" content="The spellbook of Caladrel Ecthëlion, elf Wizard 7, Conjurer (Teleportation): 105 spells as index cards.">
+    <link rel="preload" href="../fonts/CourierPrime-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="../fonts/CourierPrime-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="../catalog.css">
+    <link rel="stylesheet" href="../spells.css">
     <link rel="icon" href="data:,">
 </head>
-
-<body class="p-6" data-tsv="../spells.tsv" data-spellbook="spellbook.txt" data-opposed="enchantment,divination">
-
-    <!-- Character card -->
-    <div class="bg-brown p-4 shadow-md rounded-lg mb-6 text-parchment flex flex-col md:flex-row md:items-start md:space-x-6">
-        <img src="https://raw.githubusercontent.com/sturlabragason/pathfinder/main/caladrel.jpg"
-            alt="Portrait of Caladrel Ecth&euml;lion" class="portrait w-40 rounded-lg mb-4 md:mb-0">
-        <div class="flex-1">
-            <h1 class="text-3xl font-bold">Caladrel Ecth&euml;lion</h1>
-            <p class="mb-2">Elf Wizard 7 &middot; Conjurer (Teleportation subschool) &middot; INT 22 (+6)</p>
-            <p class="mb-2">Opposed schools: <strong>Enchantment</strong>, <strong>Divination</strong>
-                (marked <span class="opposed-badge">opposed</span> below; preparing one uses two slots).</p>
-            <p class="mb-4">
-                Full character sheet:
-                <a class="underline" href="https://github.com/sturlabragason/pathfinder/blob/main/caladrel-ecthelion.md" target="_blank" rel="noopener">caladrel-ecthelion.md</a>
-                &middot; <a class="underline" href="https://github.com/sturlabragason/pathfinder/blob/main/caladrel-ecthelion.homebrewery.md" target="_blank" rel="noopener">Homebrewery version</a>
-                &middot; <a class="underline" href="https://raw.githubusercontent.com/sturlabragason/pathfinder/main/caladrel.jpg" target="_blank" rel="noopener">portrait</a>
-                &middot; <a class="underline" href="../">all wizard spells</a>
-            </p>
-
-            <table class="slots text-center">
-                <thead>
-                    <tr><th>Spell level</th><th>0</th><th>1st</th><th>2nd</th><th>3rd</th><th>4th</th></tr>
-                </thead>
-                <tbody>
-                    <tr><th>Spells per day</th><td>4</td><td>7</td><td>6</td><td>4</td><td>2</td></tr>
-                    <tr><th>Save DC</th><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td></tr>
-                    <tr><th>In spellbook</th><td data-known-level="0"></td><td data-known-level="1"></td><td data-known-level="2"></td><td data-known-level="3"></td><td data-known-level="4"></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Filters Card -->
-    <div class="bg-brown p-4 shadow-md rounded-lg mb-6 text-parchment">
-        <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div class="flex items-center">
-                <input type="checkbox" id="myListFilter" class="mr-2" checked>
-                <label for="myListFilter" class="cursor-pointer">Show only spells in his spellbook</label>
-            </div>
-            <div class="flex items-center">
-                <label for="spellLevelFilter" class="mr-2">Filter by Level:</label>
-                <select id="spellLevelFilter">
-                    <option value="All">All Levels</option>
-                    <option value="0">Level 0</option>
-                    <option value="1">Level 1</option>
-                    <option value="2">Level 2</option>
-                    <option value="3">Level 3</option>
-                    <option value="4">Level 4</option>
-                </select>
+<body>
+    <header class="front">
+        <div class="plate">
+            <div class="plate-label">
+                <h1>ECTHËLION, Caladrel</h1>
+                <p>Spellbook · Wizard 7 · Conjurer (Teleportation)</p>
             </div>
         </div>
+        <nav class="crumbs" aria-label="Elsewhere">
+            <a href="https://caladrel.sturlabragason.online/">Character sheet</a>
+            <a href="../">All wizard spells</a>
+        </nav>
+    </header>
+
+    <div class="rail">
+    <div class="guides" role="tablist" aria-label="Spell level" id="tabs"></div>
+    <div class="guide-rule" id="tabRule"></div>
     </div>
 
-    <p id="loadError" class="hidden mb-6 font-bold"></p>
+    <main class="drawer" id="drawer">
+        <section class="card finder" aria-labelledby="finderTitle">
+            <div class="card-head">
+                <span class="call">FIND</span>
+                <h2 id="finderTitle">Look up a spell</h2>
+                <span class="aside" id="total"></span>
+            </div>
+            <div class="search">
+                <label for="q" class="visually-hidden">Search by name or summary</label>
+                <span id="searchIcon"></span>
+                <input id="q" class="field" type="search" placeholder="Name or summary, e.g. pit" autocomplete="off" spellcheck="false">
+            </div>
+            <fieldset class="chips" id="schools">
+                <legend>School</legend>
+            </fieldset>
+            <div class="finder-row">
+                <p class="tally" id="tally" aria-live="polite"></p>
+            </div>
+        </section>
 
-    <div class="overflow-x-auto">
-        <table id="spellsTable" class="w-full text-sm bg-parchment">
-            <thead class="text-lg uppercase bg-brown text-parchment">
-                <tr>
-                    <th class="py-3 px-6">Name</th>
-                    <th class="py-3 px-6">School</th>
-                    <th class="py-3 px-6">Level</th>
-                    <th class="py-3 px-6">Casting Time</th>
-                    <th class="py-3 px-6">Range</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+        <div id="levels" class="levels" role="tabpanel">
+            <div class="card notice" id="status" role="status">
+                <div class="card-head"><span class="call">WAIT</span><h2>Pulling the cards…</h2><span class="aside"></span></div>
+                <p>Reading spellbook.json.</p>
+            </div>
+        </div>
+    </main>
 
-    <script src="../spells.js"></script>
-
+    <script src="../cards.js"></script>
+    <script src="drawer.js"></script>
 </body>
-
 </html>

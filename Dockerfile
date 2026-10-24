@@ -9,10 +9,8 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 # Copy the static content of the web application into the container
-COPY index.html ./
-COPY spells.js ./
-COPY styles.css ./
-COPY spells.tsv ./
+COPY index.html spells.js cards.js catalog.css spells.css spells.tsv ./
+COPY fonts/ ./fonts/
 COPY caladrel_ecthelion/ ./caladrel_ecthelion/
 
 # Expose port 80

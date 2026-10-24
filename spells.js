@@ -1,117 +1,207 @@
-// Spell table for index.html and caladrel_ecthelion/index.html.
-// Page settings come from data-* attributes on <body>:
-//   data-tsv        path to spells.tsv                 (default "spells.tsv")
-//   data-spellbook  path to the spellbook name list    (default "caladrel_ecthelion/spellbook.txt")
-//   data-opposed    comma-separated opposed schools    (default "enchantment,divination")
-$(function () {
-    const body = document.body.dataset;
-    const tsvUrl = body.tsv || 'spells.tsv';
-    const spellbookUrl = body.spellbook || 'caladrel_ecthelion/spellbook.txt';
-    const opposed = (body.opposed || 'enchantment,divination').toLowerCase().split(',').map(s => s.trim());
-    const AON_SEARCH = 'https://aonprd.com/Search.aspx?Query=';
+// All sorcerer/wizard spells (index.html): reads spells.tsv and renders index cards in pages of 60.
+(function () {
+    'use strict';
+    const C = window.SpellCards;
+    const PAGE = 60;
+    const LEVELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const TAB_COLOURS = ['--guide-buff', '--guide-salmon', '--guide-sage', '--guide-cadet', '--guide-lilac', '--guide-ochre'];
+    const COLS = {
+        name: 'name', school: 'school', subschool: 'subschool', descriptor: 'descriptor', casting_time: 'casting_time',
+        components: 'components', range: 'range', area: 'area', effect: 'effect', targets: 'targets', duration: 'duration',
+        save: 'saving_throw', sr: 'spell_resistence', short: 'short_description', source: 'source', url: 'url'
+    };
 
-    const $level = $('#spellLevelFilter');
-    const $mine = $('#myListFilter');
-    let table = null;
+    const $ = id => document.getElementById(id);
+    const state = { tab: 'all', q: '', school: '', mine: false };
+    let rows = [];
+    let matches = [];
+    let rendered = 0;
 
-    const normalise = name => name.replace(/\u2019/g, "'").trim().toLowerCase();
-    const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    $('searchIcon').outerHTML = C.ICON_SEARCH;
 
-    function parseSpellbook(text) {
-        return new Set(text.split(/\r?\n/)
-            .map(line => line.replace(/#.*/, ''))
-            .filter(line => line.trim())
-            .map(normalise));
-    }
+    const clean = v => { v = (v || '').trim(); return v === 'NULL' || v === '-' ? '' : v; };
 
-    function parseTsv(text, spellbook) {
-        const lines = text.split(/\r?\n/).filter(line => line.trim());
-        const headers = lines[0].split('\t');
-        const col = name => headers.indexOf(name);
-        const c = {
-            mine: col('On my list'), name: col('name'), school: col('school'), wiz: col('wiz'),
-            casting: col('casting_time'), range: col('range'), url: col('url')
-        };
-        return lines.slice(1).map(line => {
+    function parseTsv(text) {
+        const lines = text.split('\n');
+        const header = lines[0].replace(/\r$/, '').split('\t');
+        const at = {};
+        header.forEach((h, i) => { at[h] = i; });
+        for (const need of ['name', 'school', 'wiz']) {
+            if (!(need in at)) throw new Error('spells.tsv has no "' + need + '" column.');
+        }
+        const out = [];
+        for (let n = 1; n < lines.length; n++) {
+            const line = lines[n].replace(/\r$/, '');
+            if (!line.trim()) continue;
             const cells = line.split('\t');
-            const name = cells[c.name];
-            const school = (cells[c.school] || '').toLowerCase();
-            const url = c.url >= 0 && cells[c.url] ? cells[c.url] : AON_SEARCH + encodeURIComponent(name);
-            return {
-                name: name,
-                school: school,
-                level: parseInt(cells[c.wiz], 10),
-                casting_time: cells[c.casting] || '',
-                range: cells[c.range] || '',
-                url: url,
-                mine: spellbook ? spellbook.has(normalise(name)) : cells[c.mine] === '1',
-                opposed: opposed.includes(school)
-            };
+            const get = col => (col in at ? clean(cells[at[col]]) : '');
+            const s = {};
+            for (const k in COLS) s[k] = get(COLS[k]);
+            s.name = s.name.replace(/\s*\(Not in Spellbook\)\s*$/i, '');
+            s.school = s.school.toLowerCase();
+            const lv = parseInt(get('wiz') || get('sor'), 10);
+            s.level = isNaN(lv) ? null : lv;
+            s.text = get('description_formated') || get('description');
+            s.mine = get('On my list') === '1';
+            s.lname = s.name.toLowerCase();
+            out.push(s);
+        }
+        return out.sort((a, b) => (a.level ?? 99) - (b.level ?? 99) || a.lname.localeCompare(b.lname));
+    }
+
+    function hay(s) {
+        if (s.hay == null) {
+            s.hay = (s.short + ' ' + s.text.replace(/<[^>]+>/g, ' ')).toLowerCase().replace(/\s+/g, ' ');
+        }
+        return s.hay;
+    }
+
+    function buildTabs() {
+        const counts = {};
+        rows.forEach(s => { counts[s.level] = (counts[s.level] || 0) + 1; });
+        const tabs = [{ key: 'all', label: 'All', n: rows.length }].concat(LEVELS.map(l => ({ key: String(l), label: String(l), n: counts[l] || 0 })));
+        $('tabs').innerHTML = tabs.map((t, i) =>
+            '<button type="button" class="guide" role="tab" id="tab-' + t.key + '" data-tab="' + t.key + '" aria-controls="results"' +
+            ' style="--tab: var(' + TAB_COLOURS[i % TAB_COLOURS.length] + ')"' +
+            (t.key === 'all' ? '' : ' aria-label="Level ' + t.key + ', ' + t.n + ' spells"') + '>' +
+            t.label + (t.key === 'all' ? '' : '<span class="n">' + t.n + '</span>') + '</button>').join('');
+        $('tabs').addEventListener('click', ev => {
+            const b = ev.target.closest('.guide');
+            if (b) selectTab(b.dataset.tab);
+        });
+        $('tabs').addEventListener('keydown', ev => {
+            if (!/^(ArrowLeft|ArrowRight|Home|End)$/.test(ev.key)) return;
+            const all = Array.from($('tabs').querySelectorAll('.guide'));
+            let i = all.findIndex(b => b.dataset.tab === state.tab);
+            i = ev.key === 'Home' ? 0 : ev.key === 'End' ? all.length - 1 : (i + (ev.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length;
+            selectTab(all[i].dataset.tab);
+            all[i].focus();
+            ev.preventDefault();
         });
     }
 
-    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex, row) {
-        if (settings.nTable.id !== 'spellsTable') {
-            return true;
-        }
-        const level = $level.val();
-        if (level && level !== 'All' && row.level !== parseInt(level, 10)) {
-            return false;
-        }
-        return !$mine.prop('checked') || row.mine;
-    });
+    function selectTab(key) {
+        state.tab = key;
+        $('tabs').querySelectorAll('.guide').forEach(b => {
+            const on = b.dataset.tab === key;
+            b.setAttribute('aria-selected', String(on));
+            b.tabIndex = on ? 0 : -1;
+            if (on) {
+                $('tabRule').style.setProperty('--tab-active', b.style.getPropertyValue('--tab'));
+                b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+            }
+        });
+        $('results').setAttribute('aria-labelledby', 'tab-' + key);
+        apply();
+    }
 
-    function showKnownCounts(rows) {
-        $('[data-known-level]').each(function () {
-            const level = parseInt(this.dataset.knownLevel, 10);
-            this.textContent = rows.filter(r => r.mine && r.level === level).length;
+    function buildSchools() {
+        const chips = [{ s: '', abbr: 'All', full: 'All schools' }].concat(C.SCHOOLS.map(s => ({ s, abbr: C.abbr(s), full: s })));
+        $('schools').insertAdjacentHTML('beforeend', chips.map(c =>
+            '<button type="button" class="chip" data-school="' + c.s + '" aria-pressed="' + (c.s === '') + '"' +
+            (c.s ? ' aria-label="' + c.full + '"' : '') + '><span class="abbr">' + c.abbr + '</span><span class="full">' + c.full + '</span></button>').join(''));
+        $('schools').addEventListener('click', ev => {
+            const b = ev.target.closest('.chip');
+            if (!b) return;
+            state.school = state.school === b.dataset.school ? '' : b.dataset.school;
+            $('schools').querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.school === state.school)));
+            apply();
         });
     }
 
-    function build(rows) {
-        showKnownCounts(rows);
-        table = $('#spellsTable').DataTable({
-            data: rows,
-            pageLength: 100,
-            order: [[2, 'asc'], [0, 'asc']],
-            createdRow: function (tr, row) {
-                if (row.opposed) {
-                    tr.classList.add('opposed');
-                }
-                if (row.mine) {
-                    tr.classList.add('mine');
-                }
-            },
-            columns: [
-                {
-                    title: 'Name', data: 'name',
-                    render: (name, type, row) => type === 'display'
-                        ? '<a href="' + escapeHtml(row.url) + '" target="_blank" rel="noopener">' + escapeHtml(name) + '</a>'
-                        : name
-                },
-                {
-                    title: 'School', data: 'school',
-                    render: (school, type, row) => type === 'display' && row.opposed
-                        ? escapeHtml(school) + ' <span class="opposed-badge" title="Opposed school: costs two slots to prepare">opposed</span>'
-                        : (type === 'display' ? escapeHtml(school) : school)
-                },
-                { title: 'Level', data: 'level', render: (level, type) => (isNaN(level) ? '' : level) },
-                { title: 'Casting Time', data: 'casting_time', render: $.fn.dataTable.render.text() },
-                { title: 'Range', data: 'range', render: $.fn.dataTable.render.text() }
-            ]
-        });
-        $level.add($mine).on('change', () => table.draw());
+    function apply() {
+        const q = state.q;
+        const level = state.tab === 'all' ? null : +state.tab;
+        const base = rows.filter(s => (level === null || s.level === level) &&
+            (!state.school || s.school === state.school) && (!state.mine || s.mine));
+        if (q) {
+            const byName = base.filter(s => s.lname.includes(q));
+            const named = new Set(byName);
+            matches = byName.concat(base.filter(s => !named.has(s) && hay(s).includes(q)));
+        } else {
+            matches = base;
+        }
+        rendered = 0;
+        $('results').textContent = '';
+        if (!matches.length) {
+            $('results').innerHTML = '<div class="card notice"><div class="card-head"><span class="call">NIL</span>' +
+                '<h2>No cards match</h2><span class="aside"></span></div><p>Try fewer letters, another level or school.</p></div>';
+        }
+        more();
     }
 
-    $.when(
-        $.ajax({ url: tsvUrl, dataType: 'text' }),
-        $.ajax({ url: spellbookUrl, dataType: 'text' }).then(text => parseSpellbook(text), () => $.Deferred().resolve(null))
-    ).done(function (tsv, spellbook) {
-        if (!spellbook) {
-            console.warn('Spellbook list not found at ' + spellbookUrl + '; using the "On my list" column of spells.tsv.');
+    function more() {
+        const next = matches.slice(rendered, rendered + PAGE);
+        $('results').insertAdjacentHTML('beforeend', next.map(s => {
+            const i = s.idx;
+            return C.card(s, {
+                id: 'r' + i,
+                stamps: s.mine ? [{ text: 'In book' }] : [],
+                teaser: s.short ? '' : C.teaser(s.text, 160)
+            }).replace('<article ', '<article data-i="' + i + '" ');
+        }).join(''));
+        rendered += next.length;
+        $('foot').hidden = rendered >= matches.length;
+        $('more').textContent = 'Show more cards (' + (matches.length - rendered) + ' left)';
+        $('tally').innerHTML = 'Showing <b>' + rendered + '</b> of ' + matches.length.toLocaleString('en') + ' cards';
+    }
+
+    function wireControls() {
+        let t = 0;
+        $('q').addEventListener('input', () => {
+            clearTimeout(t);
+            t = setTimeout(() => { state.q = $('q').value.trim().toLowerCase(); apply(); }, 120);
+        });
+        $('mine').addEventListener('click', () => {
+            state.mine = !state.mine;
+            $('mine').setAttribute('aria-pressed', String(state.mine));
+            apply();
+        });
+        $('more').addEventListener('click', more);
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver(entries => {
+                if (entries.some(e => e.isIntersecting) && rendered < matches.length) more();
+            }, { rootMargin: '800px 0px' }).observe($('sentinel'));
         }
-        build(parseTsv(tsv[0], spellbook));
-    }).fail(function () {
-        $('#loadError').removeClass('hidden').text('Could not load ' + tsvUrl + '. Serve this folder over HTTP (see README).');
-    });
-});
+        C.wire($('results'), art => rows[+art.dataset.i]);
+    }
+
+    async function load() {
+        const res = await fetch('spells.tsv');
+        if (!res.ok) throw new Error('spells.tsv answered HTTP ' + res.status + ' ' + res.statusText + '.');
+        const size = +res.headers.get('content-length');
+        if (!res.body || !size || !window.TextDecoder) return res.text();
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let text = '', got = 0, last = 0;
+        for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            got += value.length;
+            text += decoder.decode(value, { stream: true });
+            if (got - last > 400000) {
+                last = got;
+                $('progress').textContent = 'Read ' + (got / 1e6).toFixed(1) + ' of ' + (size / 1e6).toFixed(1) + ' MB of spells.tsv.';
+            }
+        }
+        return text + decoder.decode();
+    }
+
+    load()
+        .then(text => {
+            rows = parseTsv(text);
+            rows.forEach((s, i) => { s.idx = i; });
+            if (!rows.length) throw new Error('spells.tsv has no spell rows.');
+            $('total').textContent = rows.length.toLocaleString('en') + ' cards';
+            buildTabs();
+            buildSchools();
+            wireControls();
+            selectTab('all');
+        })
+        .catch(err => {
+            $('results').innerHTML = '<div class="card notice error" role="alert"><div class="card-head"><span class="call">ERR</span>' +
+                '<h2>The drawer is stuck</h2><span class="aside"></span></div><p>' + C.esc(location.protocol === 'file:'
+                    ? 'Opened from disk, so the browser will not read spells.tsv. Serve the folder over HTTP (python3 -m http.server).'
+                    : 'Could not load the spell cards: ' + err.message) + '</p></div>';
+        });
+})();

@@ -16,15 +16,19 @@ What it does, in order:
    otherwise an AoN search link.
 4. Sets the "On my list" column from caladrel_ecthelion/spellbook.txt
    (one spell name per line, case-insensitive).
+5. Writes caladrel_ecthelion/spellbook.json (scripts/build_spellbook_json.py),
+   which the spell drawer page and the character sheet read.
 
 Network: one download from gitlab.com and one page from aonprd.com, unless
-local copies are passed with --foundry-archive / --aon-html.
+local copies are passed with --foundry-archive / --aon-html, or skipped with
+--no-foundry / --no-aon (then it runs offline and only steps 4-5 change anything).
 --check-links also fetches the link of every spellbook spell (about one
 request per second) and falls back to the search link for any that fail.
 
 Needs PyYAML (pip install pyyaml) unless --no-foundry is used. From the repo root:
 
     python3 scripts/update_spells.py [--check-links]
+    python3 scripts/update_spells.py --no-foundry --no-aon   # offline: marks + JSON only
 """
 import argparse
 import html
@@ -243,6 +247,7 @@ def main():
     ap.add_argument("--foundry-archive", help="local copy of the Foundry packs/spells .tar.gz")
     ap.add_argument("--aon-html", help="local copy of " + AON_LIST_URL)
     ap.add_argument("--no-foundry", action="store_true", help="do not add spells from Foundry")
+    ap.add_argument("--no-aon", action="store_true", help="keep the existing url column (no request to aonprd.com)")
     ap.add_argument("--check-links", action="store_true",
                     help="fetch every spellbook spell link (~1 req/s); failures fall back to search links")
     args = ap.parse_args()
@@ -267,9 +272,10 @@ def main():
         print(f"Added {len(added)} spells from Foundry PF1: {', '.join(added) or '-'}")
         rows.sort(key=lambda r: r[I["name"]].lower())
 
-    by_key = aon_names(Path(args.aon_html).read_bytes() if args.aon_html else fetch(AON_LIST_URL))
-    for r in rows:
-        r[I["url"]] = aon_url(r, I, by_key)
+    if not args.no_aon:
+        by_key = aon_names(Path(args.aon_html).read_bytes() if args.aon_html else fetch(AON_LIST_URL))
+        for r in rows:
+            r[I["url"]] = aon_url(r, I, by_key)
 
     book = read_spellbook()
     wanted = {n.lower().replace("\u2019", "'"): n for n in book}
@@ -301,7 +307,11 @@ def main():
 
     TSV.write_text("\r\n".join("\t".join(r) for r in [header] + rows), encoding="utf-8", newline="")
     print(f"Wrote {len(rows)} spells to {TSV.relative_to(ROOT)}")
-    return 1 if missing else 0
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import build_spellbook_json
+    json_status = build_spellbook_json.main()
+    return 1 if missing or json_status else 0
 
 
 if __name__ == "__main__":

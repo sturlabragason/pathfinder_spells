@@ -1,78 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pathfinder Spells</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <link href="styles.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#17110c">
+    <title>Pathfinder sorcerer/wizard spells · card catalogue</title>
+    <meta name="description" content="Every Pathfinder 1e sorcerer/wizard spell as an index card: search, filter by level and school, rules text and Archives of Nethys links.">
+    <link rel="preload" href="fonts/CourierPrime-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/CourierPrime-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="catalog.css">
+    <link rel="stylesheet" href="spells.css">
     <link rel="icon" href="data:,">
 </head>
-
-<body class="p-6" data-tsv="spells.tsv" data-spellbook="caladrel_ecthelion/spellbook.txt">
-
-    <header class="mb-6">
-        <h1 class="text-3xl font-bold">Pathfinder 1e Wizard Spells</h1>
-        <p>All sorcerer/wizard spells. Spellbook: <a class="underline" href="caladrel_ecthelion/">Caladrel Ecth&euml;lion</a>.
-            Spell names link to <a class="underline" href="https://aonprd.com/" target="_blank" rel="noopener">Archives of Nethys</a>.</p>
-    </header>
-
-    <!-- Filters Card -->
-    <div class="bg-brown p-4 shadow-md rounded-lg mb-6 text-parchment">
-        <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <!-- Checkbox for filtering spells on my list -->
-            <div class="flex items-center">
-                <input type="checkbox" id="myListFilter" class="mr-2">
-                <label for="myListFilter" class="cursor-pointer">Show only spells in Caladrel&#39;s spellbook</label>
-            </div>
-
-            <!-- Dropdown filter for spell levels -->
-            <div class="flex items-center">
-                <label for="spellLevelFilter" class="mr-2">Filter by Level:</label>
-                <select id="spellLevelFilter"
-                    class="border-gray-600 rounded-md shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-400 focus:ring-opacity-50">
-                    <option value="All">All Levels</option>
-                    <option value="0">Level 0</option>
-                    <option value="1">Level 1</option>
-                    <option value="2">Level 2</option>
-                    <option value="3">Level 3</option>
-                    <option value="4">Level 4</option>
-                    <option value="5">Level 5</option>
-                    <option value="6">Level 6</option>
-                    <option value="7">Level 7</option>
-                    <option value="8">Level 8</option>
-                    <option value="9">Level 9</option>
-                </select>
+<body>
+    <header class="front">
+        <div class="plate">
+            <div class="plate-label">
+                <h1>SPELLS, Sorcerer &amp; Wizard</h1>
+                <p>Pathfinder 1e · levels 0 to 9 · one card per spell</p>
             </div>
         </div>
+        <nav class="crumbs" aria-label="Elsewhere">
+            <a href="caladrel_ecthelion/">Caladrel's spell drawer</a>
+            <a href="https://aonprd.com/Spells.aspx?Class=Wizard" target="_blank" rel="noopener">Archives of Nethys</a>
+        </nav>
+    </header>
+
+    <div class="rail">
+    <div class="guides" role="tablist" aria-label="Sorcerer/wizard spell level" id="tabs"></div>
+    <div class="guide-rule" id="tabRule"></div>
     </div>
 
-    <p id="loadError" class="hidden mb-6 font-bold"></p>
+    <main class="drawer" id="drawer">
+        <section class="card finder" aria-labelledby="finderTitle">
+            <div class="card-head">
+                <span class="call">FIND</span>
+                <h2 id="finderTitle">Look up a spell</h2>
+                <span class="aside" id="total"></span>
+            </div>
+            <div class="search">
+                <label for="q" class="visually-hidden">Search by name or rules text</label>
+                <span id="searchIcon"></span>
+                <input id="q" class="field" type="search" placeholder="Name or rules text" autocomplete="off" spellcheck="false">
+            </div>
+            <fieldset class="chips" id="schools">
+                <legend>School</legend>
+            </fieldset>
+            <div class="finder-row">
+                <button type="button" class="key toggle" id="mine" aria-pressed="false">In Caladrel's book</button>
+                <p class="tally" id="tally" aria-live="polite"></p>
+            </div>
+        </section>
 
-    <!-- Spells Table -->
-    <div class="overflow-x-auto">
-        <table id="spellsTable" class="w-full text-sm bg-parchment">
-            <thead class="text-lg uppercase bg-brown text-parchment">
-                <tr>
-                    <th class="py-3 px-6">Name</th>
-                    <th class="py-3 px-6">School</th>
-                    <th class="py-3 px-6">Level</th>
-                    <th class="py-3 px-6">Casting Time</th>
-                    <th class="py-3 px-6">Range</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data will be populated here by DataTables -->
-            </tbody>
-        </table>
-    </div>
+        <div class="stack" id="results" role="tabpanel">
+            <div class="card notice" id="status" role="status">
+                <div class="card-head"><span class="call">WAIT</span><h2>Pulling the cards…</h2><span class="aside"></span></div>
+                <p id="progress">Reading spells.tsv (about 6 MB).</p>
+            </div>
+        </div>
+        <div class="drawer-foot" id="foot" hidden>
+            <button type="button" class="key" id="more">Show more cards</button>
+            <div class="sentinel" id="sentinel"></div>
+        </div>
+    </main>
 
+    <script src="cards.js"></script>
     <script src="spells.js"></script>
-
 </body>
-
 </html>

@@ -27,6 +27,8 @@ Ray of Frost
 Read Magic (Not in Spellbook)
 Resistance
 Root
+# Restored from the level-5 sheet (pathfinder_spells 7d04e01, Nov 2023); never ticked in spells.tsv
+Scrivener's Chant
 Scoop
 Sotto Voce
 Spark
@@ -79,6 +81,8 @@ Mirror Image
 Mount, Communal
 Protection From Arrows
 Resist Energy
+# Restored from the level-5 sheet (7d04e01)
+Rope Trick
 Scorching Ray
 See Invisibility
 Spider Climb
@@ -99,6 +103,8 @@ Halt Undead
 Haste
 Heroism
 Lightning Bolt
+# Restored from the level-5 sheet (7d04e01)
+Major Image
 Mad Monkeys
 Rain of Frogs
 Ray of Exhaustion

@@ -1,0 +1,117 @@
+/* Page layer for the spell pages. Tokens and base components come from catalog.css. */
+
+.icon { flex: none; display: block; }
+
+/* ---- drawer front ---- */
+.front { padding-top: 4px; }
+.crumbs {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 0 18px;
+  margin: 6px auto 0; padding: 0 12px; font-size: var(--t-small);
+}
+.crumbs a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px;
+  color: var(--brass-hi); text-decoration: underline; text-decoration-color: rgba(227,197,140,.45);
+}
+.crumbs a:hover { color: var(--stock); text-decoration-color: currentColor; }
+
+/* ---- guide rail: tabs are buttons that filter the drawer ---- */
+.rail { position: sticky; top: 0; z-index: 10; margin-top: 6px; }
+.rail .guides { position: static; margin-top: 0; padding-inline: max(12px, calc((100% - 64rem) / 2)); }
+.guides .guide { min-height: 44px; min-width: 44px; padding: 10px 14px 8px; text-align: center; }
+.guide .n { font-weight: 400; letter-spacing: 0; margin-left: 6px; }
+
+/* ---- finder card: search, school chips, toggles ---- */
+.finder { padding-bottom: 14px; }
+.finder .card-head h2 { font-size: var(--t-label); }
+.search { position: relative; margin-top: 12px; }
+.search .icon { position: absolute; left: 12px; top: 50%; margin-top: -8px; color: var(--ink-soft); pointer-events: none; }
+.search .field { padding-left: 36px; -webkit-appearance: none; appearance: none; }
+.search .field::-webkit-search-cancel-button { -webkit-appearance: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; padding: 0; border: 0; }
+.chips legend { padding: 0; margin-bottom: 6px; font-size: var(--t-small); color: var(--ink-soft); float: left; width: 100%; }
+.chip {
+  min-height: 44px; min-width: 44px; padding: 0 10px;
+  font: 700 var(--t-small)/1 var(--font); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--sch, var(--ink)); background: var(--stock); cursor: pointer;
+  border: 1px solid currentColor; border-radius: 2px;
+}
+.chip:hover { background: #fff; }
+.chip[aria-pressed="true"] { background: var(--sch, var(--ink)); color: var(--stock); border-color: var(--sch, var(--ink)); }
+.chip .full { display: none; }
+.finder-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; margin-top: 12px; }
+.toggle[aria-pressed="true"] { background: var(--stamp); color: var(--stock); border-color: var(--stamp); }
+.tally { margin: 0; font-size: var(--t-small); color: var(--ink-soft); }
+.tally b { color: var(--ink); }
+
+/* ---- level summary cards ---- */
+.level { display: grid; gap: 14px; align-items: start; }
+.level[hidden] { display: none; }
+.summary .typed .k { color: var(--ink-soft); }
+.card p.empty { display: flex; align-items: center; min-height: calc(var(--line) * 2); margin: 0 0 0 4px; }
+
+/* ---- spell card ---- */
+.spell .card-head .aside.dc { white-space: nowrap; color: var(--ink); }
+.spell .card-head .aside.dc b { font-size: var(--t-label); }
+.spell .card-head h3 { overflow-wrap: anywhere; }
+.card p.marks { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; min-height: var(--line); }
+.marks .sub { font-size: var(--t-small); }
+.card p.stamps { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; min-height: calc(var(--line) * 2); margin: 0 0 0 4px; }
+.spell .typed li { min-width: 0; }
+.spell .typed .k { flex: none; color: var(--ink-soft); }
+.spell .typed .v { flex: 0 1 auto; min-width: 0; text-align: right; overflow-wrap: anywhere; }
+.card p.short { margin: 0; }
+
+.unfold {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; min-height: calc(var(--line) * 2); margin: 0; padding: 0 2px;
+  font: 700 var(--t-small)/1 var(--font); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink-red); background: none; border: 0; border-top: 1px dashed rgba(30,29,34,.35); cursor: pointer;
+}
+.spell { cursor: pointer; }
+.spell .fold { cursor: auto; }
+.unfold .when-open, .open .unfold .when-closed { display: none; }
+.open .unfold .when-open { display: inline; }
+.chevron { transition: transform .4s var(--ease-out); }
+.open .chevron { transform: rotate(180deg); }
+
+/* the one motion: the card unfolds in place */
+.fold {
+  display: grid; grid-template-rows: 0fr; visibility: hidden;
+  transition: grid-template-rows .4s var(--ease-out), visibility 0s linear .4s;
+}
+.open .fold { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows .4s var(--ease-out), visibility 0s; }
+.fold-inner { overflow: hidden; min-height: 0; }
+.rules { overflow-wrap: anywhere; }
+.rules p { margin: 0 0 var(--line) !important; }
+.rules ul, .rules ol { margin: 0 0 var(--line); padding-left: 1.5em; }
+.rules table {
+  display: block; max-width: 100%; overflow-x: auto; margin: 0 0 12px;
+  border-collapse: collapse; font-size: var(--t-small); line-height: 1.35;
+}
+.rules th, .rules td { border: 1px solid rgba(30,29,34,.3); padding: 3px 6px; text-align: left; vertical-align: top; }
+.card p.rules-foot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 14px;
+  margin: 0; font-size: var(--t-small);
+}
+.rules-foot .source { color: var(--ink-soft); }
+.rules-foot a { display: inline-flex; align-items: center; min-height: calc(var(--line) * 2); font-weight: 700; }
+
+/* ---- states ---- */
+.notice { padding-bottom: 16px; }
+.notice .card-head h2 { font-size: var(--t-label); }
+.notice p { margin-top: 10px !important; }
+.notice.error .call { color: var(--stamp); }
+.drawer-foot { display: grid; justify-items: center; gap: 8px; }
+.drawer-foot .key { width: min(100%, 22rem); }
+.sentinel { height: 1px; }
+
+/* ---- desktop: two cards across, each within a readable measure ---- */
+@media (min-width: 900px) {
+  .level, .stack { grid-template-columns: 1fr 1fr; }
+  .level > .summary, .stack > .notice, .stack > .drawer-foot { grid-column: 1 / -1; }
+  .chip .full { display: inline; }
+  .chip .abbr { display: none; }
+  .crumbs { font-size: var(--t-body); }
+}
+.stack { display: grid; gap: 14px; align-items: start; }
+.levels { display: grid; gap: 28px; }
