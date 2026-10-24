@@ -1,4 +1,4 @@
-// All sorcerer/wizard spells (index.html): reads spells.tsv and renders index cards in pages of 60.
+// All sorcerer/wizard spells (index.html): reads spells.tsv and renders spell entries in pages of 60.
 (function () {
     'use strict';
     const C = window.SpellCards;
@@ -127,7 +127,7 @@
         $('results').textContent = '';
         if (!matches.length) {
             $('results').innerHTML = '<div class="card notice"><div class="card-head"><span class="call">NIL</span>' +
-                '<h2>No cards match</h2><span class="aside"></span></div><p>Try fewer letters, another level or school.</p></div>';
+                '<h2>No spells match</h2><span class="aside"></span></div><p>Try fewer letters, another level or school.</p></div>';
         }
         more();
     }
@@ -144,8 +144,8 @@
         }).join(''));
         rendered += next.length;
         $('foot').hidden = rendered >= matches.length;
-        $('more').textContent = 'Show more cards (' + (matches.length - rendered) + ' left)';
-        $('tally').innerHTML = 'Showing <b>' + rendered + '</b> of ' + matches.length.toLocaleString('en') + ' cards';
+        $('more').textContent = 'Show more spells (' + (matches.length - rendered) + ' left)';
+        $('tally').innerHTML = 'Showing <b>' + rendered + '</b> of ' + matches.length.toLocaleString('en') + ' spells';
     }
 
     function wireControls() {
@@ -194,7 +194,7 @@
             rows = parseTsv(text);
             rows.forEach((s, i) => { s.idx = i; });
             if (!rows.length) throw new Error('spells.tsv has no spell rows.');
-            $('total').textContent = rows.length.toLocaleString('en') + ' cards';
+            $('total').textContent = rows.length.toLocaleString('en') + ' spells';
             buildTabs();
             buildSchools();
             wireControls();
@@ -202,8 +202,8 @@
         })
         .catch(err => {
             $('results').innerHTML = '<div class="card notice error" role="alert"><div class="card-head"><span class="call">ERR</span>' +
-                '<h2>The drawer is stuck</h2><span class="aside"></span></div><p>' + C.esc(location.protocol === 'file:'
+                '<h2>The spell list did not load</h2><span class="aside"></span></div><p>' + C.esc(location.protocol === 'file:'
                     ? 'Opened from disk, so the browser will not read spells.tsv. Serve the folder over HTTP (python3 -m http.server).'
-                    : 'Could not load the spell cards: ' + err.message) + '</p></div>';
+                    : 'Could not load the spell list: ' + err.message) + '</p></div>';
         });
 })();

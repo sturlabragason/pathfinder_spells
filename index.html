@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#17110c">
-    <title>Pathfinder sorcerer/wizard spells · card catalogue</title>
-    <meta name="description" content="Every Pathfinder 1e sorcerer/wizard spell as an index card: search, filter by level and school, rules text and d20pfsrd links.">
-    <link rel="preload" href="fonts/CourierPrime-Regular.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="fonts/CourierPrime-Bold.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="catalog.css">
-    <link rel="stylesheet" href="spells.css">
+    <meta name="theme-color" content="#d9d5cc">
+    <title>Pathfinder sorcerer/wizard spells</title>
+    <meta name="description" content="Every Pathfinder 1e sorcerer/wizard spell with rules text: search, filter by level and school, rules text and d20pfsrd links.">
+    <link rel="preload" href="fonts/AlegreyaSans-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="fonts/alegreya.css?v=2">
+    <link rel="stylesheet" href="paper.css?v=2">
+    <link rel="stylesheet" href="spells.css?v=2">
     <link rel="icon" href="data:,">
 </head>
 <body>
+<div class="paper">
     <header class="front">
         <div class="plate">
             <div class="plate-label">
                 <h1>SPELLS, Sorcerer &amp; Wizard</h1>
-                <p>Pathfinder 1e · levels 0 to 9 · one card per spell</p>
+                <p>Pathfinder 1e · levels 0 to 9 · with rules text</p>
             </div>
         </div>
         <nav class="crumbs" aria-label="Elsewhere">
-            <a href="caladrel_ecthelion/">Caladrel's spell drawer</a>
+            <a href="caladrel_ecthelion/">Caladrel's spellbook</a>
             <a href="https://www.d20pfsrd.com/magic/spell-lists-and-domains/spell-lists-sorcerer-and-wizard/" target="_blank" rel="noopener">d20pfsrd</a>
         </nav>
     </header>
@@ -54,16 +55,17 @@
 
         <div class="stack" id="results" role="tabpanel">
             <div class="card notice" id="status" role="status">
-                <div class="card-head"><span class="call">WAIT</span><h2>Pulling the cards…</h2><span class="aside"></span></div>
+                <div class="card-head"><span class="call">WAIT</span><h2>Opening the spellbook…</h2><span class="aside"></span></div>
                 <p id="progress">Reading spells.tsv (about 6 MB).</p>
             </div>
         </div>
         <div class="drawer-foot" id="foot" hidden>
-            <button type="button" class="key" id="more">Show more cards</button>
+            <button type="button" class="key" id="more">Show more spells</button>
             <div class="sentinel" id="sentinel"></div>
         </div>
     </main>
 
+</div>
     <script src="cards.js"></script>
     <script src="spells.js"></script>
 </body>

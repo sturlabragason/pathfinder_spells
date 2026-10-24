@@ -1,4 +1,5 @@
-Copyright 2015 The Courier Prime Project Authors (https://github.com/quoteunquoteapps/CourierPrime).
+Copyright 2011 The Alegreya Sans Project Authors (https://github.com/huertatipografica/Alegreya-Sans)
+Copyright 2011 The Alegreya Project Authors (https://github.com/huertatipografica/Alegreya)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

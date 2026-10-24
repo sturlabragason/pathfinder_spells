@@ -95,7 +95,7 @@
         spells = data.spells;
         const counts = {};
         spells.forEach(s => { counts[s.level] = (counts[s.level] || 0) + 1; });
-        $('total').textContent = spells.length + ' cards';
+        $('total').textContent = spells.length + ' spells';
 
         $('levels').innerHTML = LEVELS.map(level => {
             const cards = spells.map((s, i) => [s, i]).filter(([s]) => s.level === level).map(([s, i]) => {
@@ -139,13 +139,13 @@
             if (visible) shown += inLevel;
         });
         const scope = state.tab === 'all' ? spells.length : spells.filter(s => String(s.level) === state.tab).length;
-        $('tally').innerHTML = 'Showing <b>' + shown + '</b> of ' + scope + ' cards' +
+        $('tally').innerHTML = 'Showing <b>' + shown + '</b> of ' + scope + ' spells' +
             (state.tab === 'all' ? '' : ' at ' + (state.tab === '0' ? 'level 0' : ORD[+state.tab] + ' level'));
     }
 
     function fail(msg) {
         $('levels').innerHTML = '<div class="card notice error" role="alert"><div class="card-head"><span class="call">ERR</span>' +
-            '<h2>The drawer is stuck</h2><span class="aside"></span></div><p>' + C.esc(msg) + '</p></div>';
+            '<h2>The spell list did not load</h2><span class="aside"></span></div><p>' + C.esc(msg) + '</p></div>';
         $('tally').textContent = '';
     }
 

@@ -1,0 +1,196 @@
+/* paper.css: shared design system for Caladrel's sheet and the spell pages.
+   Pen-and-paper character sheet: white stock, black rule work, small-caps labels under each field. */
+
+:root {
+  --desk: #d9d5cc;
+  --paper: #fffefa;
+  --ink: #1b1a19;
+  --ink-2: #4a4744;
+  --rule: #8d8a85;
+  --hair: #c9c5bd;
+  --grey: #ebe8e1;
+  --grey-2: #dcd8cf;
+  --accent: #7e1d18;
+  --accent-soft: #f3e3df;
+  --focus: #1d4f8c;
+
+  --sans: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
+  --sc: "Alegreya Sans SC", "Alegreya Sans", system-ui, sans-serif;
+  --display: "Alegreya SC", "Alegreya Sans SC", Georgia, serif;
+
+  --t-xs: 0.75rem;
+  --t-sm: 0.875rem;
+  --t-md: 1rem;
+  --t-lg: 1.25rem;
+  --t-xl: 1.75rem;
+  --t-xxl: 2.5rem;
+
+  --r-box: 12px;
+  --stroke: 2px;
+  --gap: 14px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--desk); color: var(--ink);
+  font: 400 var(--t-md)/1.4 var(--sans); font-variant-numeric: lining-nums tabular-nums;
+}
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+p { margin: 0 0 .6em; }
+p:last-child { margin-bottom: 0; }
+
+/* ---------- the sheet of paper ---------- */
+.paper {
+  background: var(--paper);
+  width: min(100%, 76rem); margin: 0 auto; min-height: 100vh;
+  padding: 18px 12px 28px;
+}
+@media (min-width: 720px) {
+  .paper { margin: 24px auto; min-height: 0; padding: 28px 28px 32px; box-shadow: 0 1px 2px rgba(0,0,0,.12), 0 12px 40px rgba(40,30,20,.18); }
+}
+
+/* ---------- labels: small caps under the field ---------- */
+.lbl {
+  display: block; font: 700 var(--t-xs)/1.2 var(--sc); letter-spacing: .05em; color: var(--ink);
+}
+.fine { font-size: var(--t-sm); color: var(--ink-2); line-height: 1.35; }
+.center { text-align: center; }
+.nb { white-space: nowrap; }
+.unrec { color: var(--accent); font-style: italic; }
+
+/* ---------- boxes ---------- */
+.box {
+  position: relative; border: var(--stroke) solid var(--ink); border-radius: var(--r-box);
+  background: var(--paper); padding: 12px 14px 10px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+@supports (corner-shape: scoop) {
+  .box, .namebox .scroll { corner-shape: scoop; border-radius: 14px; }
+}
+.box > .lbl:last-child, .box > .lbl:last-of-type { text-align: center; margin-top: 2px; }
+.grey { background: var(--grey); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+
+/* square stat box (initiative, speed) */
+.sq {
+  border: var(--stroke) solid var(--ink); border-radius: 8px; background: var(--paper);
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: 6px 4px 5px; text-align: center; min-width: 0;
+}
+.sq b { font: 800 var(--t-xl)/1.1 var(--sans); }
+.sq b small { font-size: var(--t-sm); font-weight: 700; }
+.sq .lbl { font-size: var(--t-xs); }
+.trio.small .sq b, .spell-stats .sq b { font-size: var(--t-lg); }
+
+/* armor class shield */
+.shield {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  padding: 8px 6px 16px; min-height: 92px;
+  background: no-repeat center / 100% 100% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 112' preserveAspectRatio='none'%3E%3Cpath d='M50 2 C64 9 80 10 97 8 L96 52 C95 80 76 98 50 110 C24 98 5 80 4 52 L3 8 C20 10 36 9 50 2Z' fill='%23fffefa' stroke='%231b1a19' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+.shield b { font: 800 var(--t-xxl)/1 var(--sans); }
+.shield .lbl { margin-top: 2px; }
+
+/* pill: inspiration / proficiency style */
+.pill { display: flex; align-items: center; gap: 10px; border: var(--stroke) solid var(--ink); border-radius: 999px; padding: 0 14px 0 0; min-height: 40px; background: var(--paper); }
+.pill b { display: grid; place-items: center; min-width: 54px; height: 44px; margin: -2px 0 -2px -2px; border: var(--stroke) solid var(--ink); border-radius: 999px; font: 800 var(--t-lg)/1 var(--sans); background: var(--paper); }
+
+/* ruled lines with value slot (saves, skills, gear) */
+.lines { list-style: none; margin: 0; padding: 0; }
+.lines li { display: flex; align-items: baseline; gap: 8px; min-height: 30px; padding: 4px 0 3px; border-bottom: 1px solid var(--hair); }
+.lines li:last-child { border-bottom: 0; }
+.slot { flex: 0 0 2.6rem; text-align: center; font-weight: 800; border-bottom: 1.5px solid var(--ink); line-height: 1.25; }
+.nm small { color: var(--ink-2); font-size: var(--t-xs); }
+.lines.items li > span { flex: 1 1 auto; min-width: 0; }
+.lines.items li > b { flex: 0 0 auto; font-weight: 700; text-align: right; max-width: 60%; }
+.lines.items li.note { min-height: 0; padding-top: 0; color: var(--ink-2); font-size: var(--t-sm); border-bottom-style: dotted; }
+.lines.plain li { display: block; }
+
+/* proficiency bubble */
+.bub { flex: 0 0 auto; display: inline-block; width: 12px; height: 12px; border: 1.5px solid var(--ink); border-radius: 50%; vertical-align: -1px; background: var(--paper); }
+.bub.on { background: var(--ink); }
+.tr { display: inline-block; font: 700 10px/1 var(--sc); border: 1px solid var(--ink-2); border-radius: 3px; padding: 1px 3px 2px; margin-left: 4px; vertical-align: 2px; color: var(--ink-2); }
+
+/* table with grey rule rows, like the attacks block */
+table.grid { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-size: var(--t-sm); }
+table.grid thead th { font: 700 var(--t-xs)/1.2 var(--sc); text-align: left; padding: 0 6px; color: var(--ink-2); }
+table.grid tbody th, table.grid tbody td { background: var(--grey); padding: 5px 6px; text-align: left; font-weight: 400; }
+table.grid tbody th { font-weight: 700; border-radius: 4px 0 0 4px; }
+table.grid tbody td:last-child { border-radius: 0 4px 4px 0; }
+
+/* buttons and inputs */
+.btn, .seg-b {
+  appearance: none; font: 700 var(--t-md)/1 var(--sc); letter-spacing: .03em; color: var(--ink);
+  background: var(--paper); border: 1.5px solid var(--ink); border-radius: 8px;
+  min-height: 44px; padding: 0 14px; cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.btn:hover, .seg-b:hover { background: var(--grey); }
+.btn:active { background: var(--grey-2); }
+.btn[aria-pressed="true"], .seg-b[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.btn.wide { width: 100%; }
+.btn.slim { min-height: 36px; padding: 0 10px; font-size: var(--t-sm); }
+.input {
+  font: 400 var(--t-md)/1.2 var(--sans); color: var(--ink); background: var(--paper);
+  border: 0; border-bottom: 1.5px solid var(--ink); border-radius: 0; min-height: 40px; padding: 4px 2px; width: 100%;
+}
+.input::placeholder { color: #8a8580; }
+.seg { display: inline-flex; }
+.seg-b { border-radius: 0; }
+.seg-b:first-child { border-radius: 8px 0 0 8px; }
+.seg-b:last-child { border-radius: 0 8px 8px 0; border-left: 0; }
+
+/* name scroll */
+.namebox { display: flex; align-items: center; }
+.namebox .scroll {
+  position: relative; width: 100%; border: var(--stroke) solid var(--ink); border-radius: 10px;
+  padding: 10px 18px 6px; background: var(--paper);
+}
+.field-line { display: block; font: 800 var(--t-xl)/1.15 var(--display); border-bottom: 1.5px solid var(--ink); padding-bottom: 4px; }
+.namebox .lbl { margin-top: 4px; }
+
+/* labelled field grid (class & level, race...) */
+dl.bio { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+dl.bio > div { min-width: 0; display: flex; flex-direction: column-reverse; }
+dl.bio dt { font: 700 var(--t-xs)/1.2 var(--sc); letter-spacing: .05em; padding-top: 2px; }
+dl.bio dd { margin: 0; font-weight: 700; border-bottom: 1px solid var(--rule); padding-bottom: 2px; min-height: 1.6em; }
+dl.bio dd .nb { font-weight: 400; color: var(--ink-2); font-size: var(--t-sm); }
+
+/* section heading inside a box */
+h3.sub { margin: 4px 0 0; font: 800 var(--t-sm)/1.2 var(--sc); letter-spacing: .05em; border-bottom: 1.5px solid var(--ink); padding-bottom: 3px; }
+
+/* feature prose, 5e book style */
+.features p { margin: 0 0 .55em; }
+.features p b i { font-weight: 800; }
+
+/* checkbox pips */
+.pips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pip {
+  width: 28px; height: 28px; padding: 0; border: 1.5px solid var(--ink); border-radius: 4px; background: var(--paper);
+  cursor: pointer; position: relative;
+}
+.pip::before { content: ""; position: absolute; inset: -8px; }
+.pip.spent { background: var(--paper) no-repeat center / 70% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1 1 9 9M9 1 1 9' stroke='%231b1a19' stroke-width='1.6'/%3E%3C/svg%3E"); }
+.pip-count { margin-left: 4px; font-size: var(--t-sm); color: var(--ink-2); }
+
+/* page tabs */
+.tabs {
+  position: sticky; top: 0; z-index: 10; background: var(--paper);
+  display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none;
+  margin: 14px -12px 16px; padding: 0 12px; border-bottom: var(--stroke) solid var(--ink);
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 1 0 auto; text-align: center; text-decoration: none; padding: 12px 10px 9px;
+  font: 700 var(--t-md)/1 var(--sc); letter-spacing: .04em; color: var(--ink-2);
+  border-bottom: 4px solid transparent; margin-bottom: -2px;
+}
+.tab:hover { color: var(--ink); }
+.tab[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+@media (min-width: 720px) { .tabs { margin-inline: -28px; padding-inline: 28px; } .tab { flex: 0 0 auto; padding-inline: 18px; } }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }

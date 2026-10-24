@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#17110c">
-    <title>Caladrel's spell drawer · Ecthëlion, Wizard 7</title>
-    <meta name="description" content="The spellbook of Caladrel Ecthëlion, elf Wizard 7, Conjurer (Teleportation): 105 spells as index cards.">
-    <link rel="preload" href="../fonts/CourierPrime-Regular.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="../fonts/CourierPrime-Bold.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../catalog.css">
-    <link rel="stylesheet" href="../spells.css">
+    <meta name="theme-color" content="#d9d5cc">
+    <title>Caladrel's spellbook · Ecthëlion, Wizard 7</title>
+    <meta name="description" content="The spellbook of Caladrel Ecthëlion, elf Wizard 7, Conjurer (Teleportation): 105 spells with rules text.">
+    <link rel="preload" href="../fonts/AlegreyaSans-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="../fonts/alegreya.css?v=2">
+    <link rel="stylesheet" href="../paper.css?v=2">
+    <link rel="stylesheet" href="../spells.css?v=2">
     <link rel="icon" href="data:,">
 </head>
 <body>
+<div class="paper">
     <header class="front">
         <div class="plate">
             <div class="plate-label">
@@ -53,12 +54,13 @@
 
         <div id="levels" class="levels" role="tabpanel">
             <div class="card notice" id="status" role="status">
-                <div class="card-head"><span class="call">WAIT</span><h2>Pulling the cards…</h2><span class="aside"></span></div>
+                <div class="card-head"><span class="call">WAIT</span><h2>Opening the spellbook…</h2><span class="aside"></span></div>
                 <p>Reading spellbook.json.</p>
             </div>
         </div>
     </main>
 
+</div>
     <script src="../cards.js"></script>
     <script src="drawer.js"></script>
 </body>

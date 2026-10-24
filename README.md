@@ -6,16 +6,16 @@ A web-based tool tailored for Pathfinder spellcasters, designed to manage and fi
 
 Published on GitHub Pages: https://sturlabragason.github.io/pathfinder_spells/
 
-- `index.html`: every sorcerer/wizard spell (1,897) as an index card. Search by name or rules text, filter by spell level (guide tabs 0-9, the `wiz` column), by school, and to the spells in Caladrel's book (stamped "IN BOOK"). Cards render 60 at a time as you scroll. Tap a card to unfold its rules text and its d20pfsrd link.
-- `caladrel_ecthelion/index.html`: "Caladrel's spell drawer", the spellbook of Caladrel Ecthëlion (elf Wizard 7, Conjurer with the Teleportation subschool, opposed schools Enchantment and Divination). It reads `caladrel_ecthelion/spellbook.json` and shows, per spell level 0-4, slots per day, save DC, conjuration DC (+2 from Spell Focus and Greater Spell Focus) and the number of known spells, then one card per spell with its save DC. Opposed-school spells are stamped "OPPOSED · 2 SLOTS"; Read Magic, prepared from memory, is stamped "FROM MEMORY". His character sheet is at https://caladrel.sturlabragason.online/ (source: [sturlabragason/pathfinder](https://github.com/sturlabragason/pathfinder)); it also fetches `spellbook.json`.
+- `index.html`: every sorcerer/wizard spell (1,897) with its rules text. Search by name or rules text, filter by spell level (guide tabs 0-9, the `wiz` column), by school, and to the spells in Caladrel's book (stamped "IN BOOK"). Spells render 60 at a time as you scroll. Tap a spell to unfold its rules text and its d20pfsrd link.
+- `caladrel_ecthelion/index.html`: the spellbook of Caladrel Ecthëlion (elf Wizard 7, Conjurer with the Teleportation subschool, opposed schools Enchantment and Divination). It reads `caladrel_ecthelion/spellbook.json` and shows, per spell level 0-4, slots per day, save DC, conjuration DC (+2 from Spell Focus and Greater Spell Focus) and the number of known spells, then one entry per spell with its save DC. Opposed-school spells are stamped "OPPOSED · 2 SLOTS"; Read Magic, prepared from memory, is stamped "FROM MEMORY". His character sheet is at https://caladrel.sturlabragason.online/ (source: [sturlabragason/pathfinder](https://github.com/sturlabragason/pathfinder)); it also fetches `spellbook.json`.
 
-There are no frameworks and no build step. The look is the "card catalogue" design system shared with the character sheet:
+There are no frameworks and no build step. The look is the pen-and-paper design system shared with the character sheet (modelled on the printed 5e character sheet):
 
-- `catalog.css`: tokens and components (brass plate, guide tabs, index card, dot-leader rows, school inks, stamps). Copied from `sturlabragason/pathfinder` (`site/catalog.css`); change it there and copy it back, do not fork it here.
-- `fonts/`: Courier Prime (SIL Open Font License, `fonts/OFL.txt`).
+- `paper.css`: tokens and components (ink boxes with scooped corners, small-caps labels, ruled lines, tabs, buttons). Copied from `sturlabragason/pathfinder` (`site/paper.css`); change it there and copy it back, do not fork it here.
+- `fonts/`: Alegreya Sans, Alegreya Sans SC and Alegreya SC (SIL Open Font License, `fonts/OFL.txt`), loaded by `fonts/alegreya.css`.
 - `spells.css`: the layer for these two pages.
-- `cards.js`: renders a spell as an index card (shared by both pages).
-- `spells.js`: the all-spells page. `caladrel_ecthelion/drawer.js`: the spell drawer.
+- `cards.js`: renders a spell as a ruled box (shared by both pages).
+- `spells.js`: the all-spells page. `caladrel_ecthelion/drawer.js`: Caladrel's spellbook page.
 
 ## Spell links
 
@@ -33,7 +33,7 @@ When he learns a spell:
 
 1. Add one line with its name to `caladrel_ecthelion/spellbook.txt`.
 2. Run `python3 scripts/update_spells.py --no-foundry --no-aon --no-pfsrd` (offline, no PyYAML needed). It sets the `On my list` column of `spells.tsv` and rewrites `caladrel_ecthelion/spellbook.json` (via `scripts/build_spellbook_json.py`). It exits with status 1 and names any line it cannot find in `spells.tsv`.
-3. Commit `spellbook.txt`, `spells.tsv` and `spellbook.json` and push to `main`. GitHub Pages republishes in a minute or two, and the drawer and the character sheet pick it up.
+3. Commit `spellbook.txt`, `spells.tsv` and `spellbook.json` and push to `main`. GitHub Pages republishes in a minute or two, and the spellbook page and the character sheet pick it up.
 
 The slots per day, caster level and opposed schools are in `CHARACTER` at the top of `scripts/build_spellbook_json.py`; change them there when he levels up.
 
