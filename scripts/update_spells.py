@@ -100,6 +100,14 @@ def plain(name):
     return re.sub(r"\s*\([^)]*\)\s*$", "", name.replace("<", ",")).strip()
 
 
+MINOR_WORDS = re.compile(r"(?<=\S )(Of|From|The|And|To|In|With|On|A|An|For|At|By|Or)\b")
+
+
+def tidy_name(name):
+    """Lower-case small words inside a title ("Ray Of Enfeeblement" -> "Ray of Enfeeblement"), as d20pfsrd does."""
+    return MINOR_WORDS.sub(lambda m: m.group(1).lower(), name)
+
+
 def read_tsv():
     lines = TSV.read_text(encoding="utf-8").split("\n")
     header = lines[0].rstrip("\r").split("\t")
@@ -324,6 +332,8 @@ def main():
         print(f"Link check: {len(failed)} direct links failed and now use search: {', '.join(failed) or '-'}")
         print(f"Spellbook spells linking to AoN search: {', '.join(search) or '-'}")
 
+    for r in rows:
+        r[I["name"]] = tidy_name(r[I["name"]])
     TSV.write_text("\r\n".join("\t".join(r) for r in [header] + rows), encoding="utf-8", newline="")
     print(f"Wrote {len(rows)} spells to {TSV.relative_to(ROOT)}")
 

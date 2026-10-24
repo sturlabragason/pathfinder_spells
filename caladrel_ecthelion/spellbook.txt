@@ -19,7 +19,7 @@ Light
 Mage Hand
 Mending
 Message
-Oath Of Anonymity
+Oath of Anonymity
 Open/Close
 Penumbra
 Prestidigitation
@@ -52,8 +52,8 @@ Magic Missile
 Mount
 Mudball
 Obscuring Mist
-Protection From Evil
-Ray Of Enfeeblement
+Protection from Evil
+Ray of Enfeeblement
 Serren's Swift Girding
 Shadow Trap
 Shield
@@ -79,7 +79,7 @@ Knock
 Make Whole
 Mirror Image
 Mount, Communal
-Protection From Arrows
+Protection from Arrows
 Resist Energy
 # Restored from the level-5 sheet (7d04e01)
 Rope Trick
