@@ -52,7 +52,8 @@
     }
 
     // spell: {name, level, school, subschool, descriptor, casting_time, components, range, area, effect,
-    //         targets, duration, save, sr, short, source, url, text}
+    //         targets, duration, save, sr, short, source, url, link_source, text}
+    //         url is the d20pfsrd page when link_source is 'd20pfsrd', else the Archives of Nethys link.
     // opts:   {id, dc, stamps: [{text, cls}], teaser}
     function card(spell, opts) {
         opts = opts || {};
@@ -100,8 +101,9 @@
         const foot = document.createElement('p');
         foot.className = 'rules-foot';
         const url = spell.url || AON_SEARCH + encodeURIComponent(spell.name);
+        const label = spell.url && spell.link_source === 'd20pfsrd' ? 'd20pfsrd' : 'Archives of Nethys';
         foot.innerHTML = (spell.source ? '<span class="source">Source: ' + esc(spell.source) + '</span>' : '') +
-            '<a href="' + esc(url) + '" target="_blank" rel="noopener">Archives of Nethys →</a>';
+            '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + label + ' →</a>';
         inner.appendChild(foot);
     }
 

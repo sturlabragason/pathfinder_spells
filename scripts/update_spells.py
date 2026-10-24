@@ -14,21 +14,29 @@ What it does, in order:
 3. Sets the "url" column for every spell: a direct Archives of Nethys
    (aonprd.com) SpellDisplay link when the name is on AoN's wizard spell list,
    otherwise an AoN search link.
-4. Sets the "On my list" column from caladrel_ecthelion/spellbook.txt
+4. Sets the "pfsrd" column: a d20pfsrd.com link verified against the
+   d20pfsrd sitemap and, where needed, the page itself (scripts/pfsrd_links.py,
+   which caches what it downloads in scripts/.cache/). Spells without a
+   verified d20pfsrd page keep an empty cell and the pages use "url" instead.
+5. Sets the "On my list" column from caladrel_ecthelion/spellbook.txt
    (one spell name per line, case-insensitive).
-5. Writes caladrel_ecthelion/spellbook.json (scripts/build_spellbook_json.py),
+6. Writes caladrel_ecthelion/spellbook.json (scripts/build_spellbook_json.py),
    which the spell drawer page and the character sheet read.
 
 Network: one download from gitlab.com and one page from aonprd.com, unless
 local copies are passed with --foundry-archive / --aon-html, or skipped with
---no-foundry / --no-aon (then it runs offline and only steps 4-5 change anything).
---check-links also fetches the link of every spellbook spell (about one
-request per second) and falls back to the search link for any that fail.
+--no-foundry / --no-aon. The d20pfsrd step reads the cached sitemap (refreshed
+monthly) and fetches only pages it has not checked before; skip it with
+--no-pfsrd. With --no-foundry --no-aon --no-pfsrd it runs offline and only
+steps 5-6 change anything.
+--check-links also fetches the AoN and d20pfsrd link of every spellbook spell
+(about one request per second); failed AoN links fall back to the search
+link, failed d20pfsrd links are dropped.
 
 Needs PyYAML (pip install pyyaml) unless --no-foundry is used. From the repo root:
 
     python3 scripts/update_spells.py [--check-links]
-    python3 scripts/update_spells.py --no-foundry --no-aon   # offline: marks + JSON only
+    python3 scripts/update_spells.py --no-foundry --no-aon --no-pfsrd   # offline: marks + JSON only
 """
 import argparse
 import html
@@ -248,6 +256,8 @@ def main():
     ap.add_argument("--aon-html", help="local copy of " + AON_LIST_URL)
     ap.add_argument("--no-foundry", action="store_true", help="do not add spells from Foundry")
     ap.add_argument("--no-aon", action="store_true", help="keep the existing url column (no request to aonprd.com)")
+    ap.add_argument("--no-pfsrd", action="store_true",
+                    help="keep the existing pfsrd column (no requests to d20pfsrd.com)")
     ap.add_argument("--check-links", action="store_true",
                     help="fetch every spellbook spell link (~1 req/s); failures fall back to search links")
     args = ap.parse_args()
@@ -276,6 +286,15 @@ def main():
         by_key = aon_names(Path(args.aon_html).read_bytes() if args.aon_html else fetch(AON_LIST_URL))
         for r in rows:
             r[I["url"]] = aon_url(r, I, by_key)
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    if not args.no_pfsrd:
+        import pfsrd_links
+        pfsrd_links.apply(header, rows, check="book" if args.check_links else "none")
+    elif "pfsrd" not in header:
+        header.append("pfsrd")
+        for r in rows:
+            r.append("")
 
     book = read_spellbook()
     wanted = {n.lower().replace("\u2019", "'"): n for n in book}
@@ -308,7 +327,6 @@ def main():
     TSV.write_text("\r\n".join("\t".join(r) for r in [header] + rows), encoding="utf-8", newline="")
     print(f"Wrote {len(rows)} spells to {TSV.relative_to(ROOT)}")
 
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
     import build_spellbook_json
     json_status = build_spellbook_json.main()
     return 1 if missing or json_status else 0

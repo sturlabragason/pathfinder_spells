@@ -8,7 +8,7 @@
     const COLS = {
         name: 'name', school: 'school', subschool: 'subschool', descriptor: 'descriptor', casting_time: 'casting_time',
         components: 'components', range: 'range', area: 'area', effect: 'effect', targets: 'targets', duration: 'duration',
-        save: 'saving_throw', sr: 'spell_resistence', short: 'short_description', source: 'source', url: 'url'
+        save: 'saving_throw', sr: 'spell_resistence', short: 'short_description', source: 'source', aon: 'url', pfsrd: 'pfsrd'
     };
 
     const $ = id => document.getElementById(id);
@@ -39,6 +39,8 @@
             for (const k in COLS) s[k] = get(COLS[k]);
             s.name = s.name.replace(/\s*\(Not in Spellbook\)\s*$/i, '');
             s.school = s.school.toLowerCase();
+            s.url = s.pfsrd || s.aon;
+            s.link_source = s.pfsrd ? 'd20pfsrd' : 'aon';
             const lv = parseInt(get('wiz') || get('sor'), 10);
             s.level = isNaN(lv) ? null : lv;
             s.text = get('description_formated') || get('description');

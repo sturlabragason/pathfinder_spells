@@ -2,7 +2,7 @@
 """Write caladrel_ecthelion/spellbook.json from spells.tsv and spellbook.txt.
 
 The JSON holds every spell in Caladrel's spellbook with the fields needed at the
-table (level, school, casting, range, duration, save, rules text, AoN link). The
+table (level, school, casting, range, duration, save, rules text, link). The
 character sheet at caladrel.sturlabragason.online and caladrel_ecthelion/index.html
 both read it. update_spells.py runs this at the end; run it alone after editing
 spellbook.txt.
@@ -35,7 +35,7 @@ FIELDS = {
     "casting_time": "casting_time", "components": "components", "range": "range",
     "area": "area", "effect": "effect", "targets": "targets", "duration": "duration",
     "save": "saving_throw", "sr": "spell_resistence", "short": "short_description",
-    "source": "source", "url": "url",
+    "source": "source",
 }
 UNSAFE = re.compile(r"<\s*(script|style|iframe)[^>]*>.*?<\s*/\s*\1\s*>|\son\w+\s*=\s*\"[^\"]*\"", re.I | re.S)
 
@@ -74,6 +74,11 @@ def main():
         for k, col in FIELDS.items():
             s[k] = clean(r.get(col))
         s["school"] = s["school"].lower()
+        # url: the verified d20pfsrd page (scripts/pfsrd_links.py), else the Archives of Nethys link
+        s["aon"] = clean(r.get("url"))
+        pfsrd = clean(r.get("pfsrd"))
+        s["url"] = pfsrd or s["aon"]
+        s["link_source"] = "d20pfsrd" if pfsrd else "aon"
         text = clean(r.get("description_formated")) or "".join(
             f"<p>{p}</p>" for p in re.split(r"\s{2,}", clean(r.get("description"))) if p)
         s["text"] = UNSAFE.sub("", text)
