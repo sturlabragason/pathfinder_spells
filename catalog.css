@@ -35,7 +35,7 @@
   --sch-conjuration: #0d6b5c;
   --sch-divination: #7a5c08;
   --sch-enchantment: #9c2c68;
-  --sch-evocation: #b0301f;
+  --sch-evocation: #b3471a;
   --sch-illusion: #4a3f9c;
   --sch-necromancy: #34343a;
   --sch-transmutation: #95501a;
@@ -146,6 +146,7 @@ a:hover { color: var(--ink-red); }
 .card-head h2, .card-head h3 {
   margin: 0; font-size: var(--t-label); line-height: 1.25; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; text-wrap: balance;
 }
+.card-head:not(:has(.call)) { grid-template-columns: 1fr auto; }
 .card-head .aside { font-size: var(--t-small); color: var(--ink-soft); text-align: right; }
 .card-body { padding-top: 0; }
 .card p { margin: 0 0 var(--line); max-width: 70ch; }
