@@ -93,7 +93,7 @@ p:last-child { margin-bottom: 0; }
   background: no-repeat center / 100% 100% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 112' preserveAspectRatio='none'%3E%3Cpath d='M50 2 C64 9 80 10 97 8 L96 52 C95 80 76 98 50 110 C24 98 5 80 4 52 L3 8 C20 10 36 9 50 2Z' fill='%23fffefa' stroke='%231b1a19' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
 }
 .shield b { font: 800 var(--t-xxl)/1 var(--sans); }
-.shield .lbl { margin-top: 2px; }
+.shield .lbl { margin-top: 2px; line-height: 1.1; }
 
 /* pill: inspiration / proficiency style */
 .pill { display: flex; align-items: center; gap: 10px; border: var(--stroke) solid var(--ink); border-radius: 999px; padding: 0 14px 0 0; min-height: 40px; background: var(--paper); }
@@ -191,6 +191,8 @@ h3.sub { margin: 4px 0 0; font: 800 var(--t-sm)/1.2 var(--sc); letter-spacing: .
 }
 .tab:hover { color: var(--ink); }
 .tab[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+@media (max-width: 479px) { .tab { padding-inline: 4px; letter-spacing: 0; font-size: .9375rem; } }
+@media (max-width: 380px) { .tab { font-size: .8125rem; } }
 @media (min-width: 720px) { .tabs { margin-inline: -28px; padding-inline: 28px; } .tab { flex: 0 0 auto; padding-inline: 18px; } }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
