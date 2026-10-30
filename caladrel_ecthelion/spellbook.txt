@@ -118,3 +118,5 @@ Summon Monster III
 Thunderstomp, Greater
 
 # Level 4
+Acid Pit
+Dimension Door
