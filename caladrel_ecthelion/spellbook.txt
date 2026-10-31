@@ -94,6 +94,7 @@ Web
 # Level 3
 Ablative Barrier
 Aqueous Orb
+Blink
 Chain of Perdition
 Dispel Magic
 Displacement
@@ -110,6 +111,7 @@ Mad Monkeys
 Rain of Frogs
 Ray of Exhaustion
 Shifting Sand
+Sleet Storm
 Slow
 Spiked Pit
 Stinking Cloud
