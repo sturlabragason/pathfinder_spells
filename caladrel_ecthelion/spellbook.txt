@@ -92,6 +92,7 @@ Summon Swarm
 Web
 
 # Level 3
+Ablative Barrier
 Aqueous Orb
 Chain of Perdition
 Dispel Magic
@@ -118,5 +119,5 @@ Summon Monster III
 Thunderstomp, Greater
 
 # Level 4
-Acid Pit
-Dimension Door
+Black Tentacles
+Summon Monster IV
